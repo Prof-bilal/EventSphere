@@ -188,7 +188,13 @@ const EditProfile = async (req, res) => {
             ? `/uploads/users/${req.file.filename}`
             : undefined;
 
-        const update = await User.findByIdAndUpdate(userId, { name, phone, profileImage }, { returnDocument: "after", runValidators: true });
+        const updateData = { name, phone };
+
+        if (profileImage) {
+            updateData.profileImage = profileImage;
+        }
+
+        const update = await User.findByIdAndUpdate(userId, updateData, { returnDocument: "after", runValidators: true });
         if (!update) {
             return res.status(404).json({ message: "User not found" });
         }

@@ -3,7 +3,8 @@ const Expo = require('../model/expomodel');
 const createExpo = async (req, res) => {
     try {
 
-        const { title, description, theme, startDate, endDate, registrationDeadline, status, capacity, location, organizerId } = req.body;
+        const { title, description, theme, startDate, endDate, registrationDeadline, status, capacity, location } = req.body;
+        const organizerId = req.user.id;
 
         const imageUrl = req.file
             ? `/uploads/expo/${req.file.filename}`
@@ -43,6 +44,26 @@ const getExpo = async (req, res) => {
     }
 }
 
+const getExpoDetail = async (req , res) => {
+      try {
+        const {id} = req.params;
+      
+
+        const getExpo = await Expo.findById(id)
+
+        if (!getExpo) {
+            return res.status(404).json({message : "Expo Details not found"})
+        }
+
+        return res.status(200).json({
+           getExpo
+        })
+
+      }
+      catch (error) {
+         res.status(500).json({error : error.message})
+      }
+}
 const updateExpo = async (req, res) => {
     try {
         const { id } = req.params;
@@ -68,7 +89,7 @@ const updateExpo = async (req, res) => {
         let updateddata = { ...req.body }
 
         if (req.file) {
-            updateddata.imageUrl = `/uploads/expos/${req.file.filename}`;
+            updateddata.imageUrl = `/uploads/expo/${req.file.filename}`;
         }
 
 
@@ -122,6 +143,7 @@ module.exports = {
     createExpo,
     getExpo,
     updateExpo,
-    deleteExpo
+    deleteExpo,
+    getExpoDetail
 
 }

@@ -9,7 +9,7 @@ router.post("/register" ,userUpload.single("profilePicture"), UserController.reg
 router.post("/login" , UserController.LoginUser);
 router.post("/logout" , UserController.LogoutUser);
 router.get("/profile" , authMiddleware, UserController.Profile);
-router.put("/editprofile" , userUpload.single("profilePicture"), authMiddleware, UserController.EditProfile);
+router.put("/editprofile" , authMiddleware, userUpload.single("profilePicture"), UserController.EditProfile);
 router.get("/verify-email" , UserController.VerifyEmail);
 router.post("/forgot-password", UserController.ForgotPassword);
 router.post("/reset-password", UserController.ResetPassword);

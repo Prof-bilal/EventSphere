@@ -7,9 +7,10 @@ const expoupload = forFolder("expo")
 const router = express.Router();
 
 
-router.post("/createExpo" , authMiddleware ,expoupload.single("image"),autharize("admin"), ExpoController.createExpo)
-router.get("/getExpo" , authMiddleware , autharize("admin") , ExpoController.getExpo)
+router.post("/createExpo" , authMiddleware,autharize("admin"),expoupload.single("image"), ExpoController.createExpo)
+router.get("/getExpo" , ExpoController.getExpo)
 router.put("/updateExpo/:id" , authMiddleware, autharize("admin") , expoupload.single("image") , ExpoController.updateExpo)
 router.delete("/deleteExpo/:id" , authMiddleware , autharize("admin") , ExpoController.deleteExpo)
+router.get("/getExpo/:id" , ExpoController.getExpoDetail)
 
 module.exports = router
