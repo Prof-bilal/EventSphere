@@ -6,6 +6,7 @@ const revokedTokenModel = require("../model/revokesession");
 const { sendEmail, sendPasswordResetEmail } = require("../services/BrevoServices");
 
 const registerUser = async (req, res) => {
+
     try {
         const { name, email, password, phone, role } = req.body;
 
@@ -107,11 +108,11 @@ const LoginUser = async (req, res) => {
             });
         }
 
-       if (!user.isEmailVerified) {
-    return res.status(403).json({
-        message: "Please verify your email first",
-    });
-}
+        if (!user.isEmailVerified) {
+            return res.status(403).json({
+                message: "Please verify your email first",
+            });
+        }
 
 
         const token = jwt.sign({ id: user._id, role: user.role, jti: crypto.randomUUID() }, process.env.JWT_SECRET, { expiresIn: "7d" });

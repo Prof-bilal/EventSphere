@@ -50,7 +50,7 @@ const exposchema = new mongoose.Schema({
     },
     imageUrl: {
         type: String,
-    
+        
         match: [/^https?:\/\/.+\.(jpg|jpeg|png|gif)$/, "Please provide a valid image URL"]
     },
     createdAt: {
