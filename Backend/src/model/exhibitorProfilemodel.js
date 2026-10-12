@@ -40,7 +40,8 @@ const exhibitorProfileSchema = mongoose.Schema({
         required: [true, "Please Provide contact person contact no"]
     },
     documents: {
-        type: String,
+        type: [String],
+        default: []
     },
     createdAt: {
         type: Date,

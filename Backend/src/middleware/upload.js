@@ -5,11 +5,21 @@ const fs = require("fs");
 const uploadsRoot = path.join(__dirname, "../../uploads");
 const allowedFolders = new Set(["users", "expo" , "exhibitor"]);
 
-const fileFilter = (req, file, cb) => {
-    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+const fileFilter = (folderName, req, file, cb) => {
+    const imageTypes = ["image/jpeg", "image/png", "image/webp"];
+    const documentTypes = [
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ...imageTypes
+    ];
+
+    const allowedTypes = folderName === "exhibitor" && file.fieldname === "documents"
+        ? documentTypes
+        : imageTypes;
 
     if (!allowedTypes.includes(file.mimetype)) {
-        const error = new Error("Invalid file type. Only JPEG, PNG, and WEBP are allowed.");
+        const error = new Error("Invalid file type.");
         error.status = 400;
         return cb(error, false);
     }
@@ -37,7 +47,7 @@ function forFolder(folderName) {
 
     return multer({
         storage,
-        fileFilter,
+        fileFilter: (req, file, cb) => fileFilter(folderName, req, file, cb),
         limits: { fileSize: 5 * 1024 * 1024 },
     });
 }
