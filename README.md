@@ -1,168 +1,115 @@
 # EventSphere
 
-EventSphere is an event management web application with a Node.js backend and a React frontend (Vite + Tailwind). This repository contains both the Backend and frontend apps and supporting documentation (DB collections, roles/workflows, roadmaps).
+EventSphere is an event-management application with a React frontend and a Node.js/Express backend. It helps organizers manage expos, exhibitors, applications, booths, and attendees.
 
-Short tech summary
+This guide is written for beginners setting up the project for the first time.
 
-- Backend: Node.js, Express, MongoDB
-- Frontend: React, Vite, Tailwind CSS, React Router, Framer Motion
-- DB: MongoDB (see db-collections.md for collection schemas)
+## Project structure
 
-Repository structure
+~~~text
+EventSphere/
+├── Backend/      # Node.js, Express, MongoDB API
+├── frontend/     # React and Vite web application
+└── README.md     # This guide
+~~~
 
-- Backend/ — Node.js API server and configuration
-- frontend/ — React + Vite frontend
-- db-collections.md — database collections and fields
-- requirements.md, roles-workflows-api.md, roadmap-checklist.md — planning docs
+## What you need first
 
-Quick start (local)
+Install Node.js 18 or newer, Git, MongoDB (local or MongoDB Atlas), and Postman.
 
-Prerequisites
+## 1. Get the project
 
-- Node.js (18+ recommended) or newer
-- npm
-- MongoDB running locally or accessible via MONGO_URI
+~~~bash
+git clone https://github.com/Prof-bilal/EventSphere.git
+cd EventSphere
+~~~
 
-Run backend
+If you already have the project, update it before starting:
 
-1. Open a terminal and start the backend:
+~~~bash
+git switch main
+git pull origin main
+~~~
 
-```sh
+## 2. Set up the backend
+
+~~~bash
 cd Backend
 npm install
+~~~
+
+Create a private file named .env inside Backend/:
+
+~~~env
+PORT=4000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=use_a_long_random_secret
+BREVO_API_KEY=your_brevo_api_key
+BREVO_SENDER_EMAIL=your_sender_email
+BREVO_SENDER_NAME=EventSphere
+FRONTEND_URL=http://localhost:5173
+~~~
+
+Replace the example values with your own. Never commit this file. If it was ever pushed publicly, rotate the MongoDB password, JWT secret, Brevo API key, and any other exposed credentials.
+
+Start the backend:
+
+~~~bash
 npm run dev
-```
+~~~
 
-- The backend will read configuration from a .env file located at Backend/.env. By default the server listens on PORT (example 4000).
-- If no PORT is provided, fallback values may be used by the app. Check Backend/.env.example or the code for defaults.
+The API normally runs at http://localhost:4000. For routes and Postman examples, read [Backend/README.md](Backend/README.md).
 
-Run frontend
+## 3. Set up the frontend
 
-1. Start the frontend in a separate terminal:
+Open a second terminal from the project root:
 
-```sh
+~~~bash
 cd frontend
 npm install
 npm run dev
-```
+~~~
 
-2. By default the frontend dev server uses Vite (commonly on http://localhost:5173). The frontend expects BACKEND API calls to target the backend server (see FRONTEND_URL in Backend/.env for a sample).
+Open the local URL printed by Vite, usually http://localhost:5173.
 
-Backend configuration (important)
+Create a production build when needed:
 
-Do NOT commit secrets or real credentials into the repository. Backend/.env in the repository is for local development reference only — replace values with your own and keep secrets out of source control.
+~~~bash
+npm run build
+npm run preview
+~~~
 
-Create Backend/.env (example)
+For available pages and current frontend limitations, read [frontend/README.md](frontend/README.md).
 
-```env
-# Backend server port
-PORT=4000
+## Beginner Git workflow
 
-# MongoDB connection string (use your own MongoDB URI)
-MONGO_URI=mongodb://localhost:27017/Eventsphere
+Create a branch before making changes:
 
-# JWT secret for signing tokens
-JWT_SECRET=your_jwt_secret_here
+~~~bash
+git switch -c feature/short-description
+~~~
 
-# Email provider (Brevo / Sendinblue) API key and sender details
-BREVO_API_KEY=your_brevo_api_key_here
-BREVO_SENDER_EMAIL=your_sender_email@example.com
-BREVO_SENDER_NAME=EventSphere
+After making and testing changes:
 
-# URL to your frontend app (used in email links)
-FRONTEND_URL=http://localhost:5173
-```
+~~~bash
+git status
+git diff
+git add .
+git commit -m "Describe the change"
+git push -u origin feature/short-description
+~~~
 
-- Replace placeholder values with secure values.
-- Never push `.env`, API keys, or passwords to git. Use environment-specific configuration or a secrets manager for production.
+Then open a pull request on GitHub. Do not commit .env, passwords, API keys, tokens, node_modules, build output, or uploaded private files.
 
-Environment tips
+## Common problems
 
-- Use a different database for development, test, and production.
-- Use long, random values for JWT_SECRET and rotate them if suspected compromised.
-- The codebase includes email verification and password reset flows; set BREVO_API_KEY to a working transactional email provider key (or mock email sending in development).
+- **npm is not recognized:** install Node.js and reopen your terminal.
+- **MongoDB connection fails:** check MONGO_URI, database access rules, and whether the database is running.
+- **Port is already in use:** change PORT in Backend/.env or stop the process using that port.
+- **The frontend cannot reach the API:** make sure the backend is running and its CORS/frontend URL settings match your local frontend URL.
+- **A page works through navigation but not after refresh:** configure the deployed frontend server to return index.html for client-side routes.
 
-Database
+## More project notes
 
-- The project expects MongoDB. See db-collections.md at the repo root for collection definitions and fields used by the backend.
-
-Seeding and roles
-
-- Admin/Organizer roles are typically provisioned by a seed script or initial database setup. Check Backend seed files or the backend README for details about how management roles are created.
-
-API overview (routes documented in Backend/README.md)
-
-The backend exposes REST endpoints under `/api/*`. Below is a concise summary copied from the backend README — consult Backend/README.md for full details:
-
-Auth
-
-- POST /api/auth/register — register new user
-- POST /api/auth/login — login and receive JWT
-- POST /api/auth/logout — logout
-- GET /api/auth/profile — get current user profile
-- GET /api/auth/verify-email — verify email (used in verification links)
-- POST /api/auth/forgot-password — request password reset
-- POST /api/auth/reset-password — reset password using token
-
-Expo (events)
-
-- POST /api/expo/createExpo — create an expo/event
-- GET /api/expo/getExpo — list expos
-- GET /api/expo/getExpo/:id — get expo by id
-- PUT /api/expo/updateExpo/:id — update expo
-- DELETE /api/expo/deleteExpo/:id — delete expo
-
-Exhibitor
-
-- POST /api/exhibitor/createProfile — create exhibitor profile
-- GET /api/exhibitor/getExhibitors — list exhibitor profiles
-- GET /api/exhibitor/getExhibitor/:id — get exhibitor by id
-- PUT /api/exhibitor/updateexhibitor/:id — update exhibitor
-- DELETE /api/exhibitor/deleteexhibitor/:id — delete exhibitor
-
-Exhibitor Applications
-
-- POST /api/exhibitorApplication/create/:expoId — submit application for an expo
-- GET /api/exhibitorApplication/getApplications — list applications
-- GET /api/exhibitorApplication/getApplication/:id — get application
-- PUT /api/exhibitorApplication/updateexhibitor/:id — update application
-- PUT /api/exhibitorApplication/approve/:id — approve application
-- PUT /api/exhibitorApplication/reject/:id — reject application
-
-Booth management
-
-- POST /api/booth/create/:expoId — create a booth for an expo
-- PUT /api/booth/assign/:id — assign a booth
-- GET /api/booth/getBooth — list booths
-- GET /api/booth/getMyBooths — get booths for current exhibitor
-- PUT /api/booth/updateBooth/:id — update booth
-- DELETE /api/booth/deleteBooth/:id — delete booth
-
-Other notes
-
-- The backend README contains additional developer notes, recommended git workflows, and safety reminders (for example, do not commit `.env` or password files into the repo).
-- See Backend/README.md for more detailed developer guidance, commands, and the intended project workflow.
-
-Frontend notes
-
-- The frontend is a Vite React app. See frontend/README.md for a quick start and the list of pages.
-- Important pages include landing (/), /login, /register (role-based), password reset flows, and management pages for Admin/Organizer roles.
-- The frontend README also includes a student guide file: frontend/Readme-Student Guide-eProject Process.txt
-
-More documentation
-
-- db-collections.md — detailed database collections and field definitions
-- roles-workflows-api.md — information about roles and API workflows
-- requirements.md — project requirements
-- roadmap-checklist.md — roadmap and checklist
-
-What I changed
-
-- Added this top-level README.md summarizing backend and frontend, including environment configuration guidance and a concise API route map (based on Backend/README.md and Backend/.env). I avoided copying secrets — example values are placeholders. The detailed backend README and frontend README remain in their folders.
-
-Next steps I recommend
-
-- Add a Backend/.env.example file (gitignored) with the template shown above so contributors can copy it safely.
-- Add a short CONTRIBUTING.md describing how to run the project, how to open issues and PRs, and branch naming conventions.
-- If you want, I can create Backend/.env.example and CONTRIBUTING.md now.
+See [requirements.md](requirements.md), [roadmap-checklist.md](roadmap-checklist.md), [roles-workflows-api.md](roles-workflows-api.md), and [db-collections.md](db-collections.md) for additional documentation.
 
