@@ -82,7 +82,7 @@ const editExhibitor = async (req, res) => {
             ];
         }
 
-        const updateExhibitor = await Exhibitor.findByIdAndUpdate(id, updatedata, { returnDocument: "after", runValidators: true });
+        const updateExhibitor = await Exhibitor.findByIdAndUpdate(id, updatedata, { UpdatedAt : Date.now(), returnDocument: "after", runValidators: true });
 
         return res.status(200).json({ message: "Data Update Successfully", data: updateExhibitor })
     }

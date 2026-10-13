@@ -94,7 +94,7 @@ const updateExpo = async (req, res) => {
 
 
         const updateExpo = await Expo.findByIdAndUpdate(
-            id, updateddata, { returnDocument: "after", runValidators: true }
+            id, updateddata, {updatedAt : Date.now(), returnDocument: "after", runValidators: true }
         )
 
 

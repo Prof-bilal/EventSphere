@@ -194,7 +194,7 @@ const EditProfile = async (req, res) => {
             updateData.profileImage = profileImage;
         }
 
-        const update = await User.findByIdAndUpdate(userId, updateData, { returnDocument: "after", runValidators: true });
+        const update = await User.findByIdAndUpdate(userId, updateData, { UpdatedAt : Date.now(), returnDocument: "after", runValidators: true });
         if (!update) {
             return res.status(404).json({ message: "User not found" });
         }

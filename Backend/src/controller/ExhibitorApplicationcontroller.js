@@ -86,6 +86,7 @@ const UpdateApplication = async (req, res) => {
             updateFields.submittedDocuments = [...submittedDocuments, ...files.map(file => `/uploads/applications/${file.filename}`)];
         }
         const updatedApplication = await ExhibitorApplication.findByIdAndUpdate(id, updateFields, {
+            updatedAt : Date.now(),
             returnDocument: "after",
             runValidators: true
         });
