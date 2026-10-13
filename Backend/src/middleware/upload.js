@@ -3,7 +3,7 @@ const path = require("path");
 const fs = require("fs");
 
 const uploadsRoot = path.join(__dirname, "../../uploads");
-const allowedFolders = new Set(["users", "expo" , "exhibitor"]);
+const allowedFolders = new Set(["users", "expo" , "exhibitor", "applications"]);
 
 const fileFilter = (folderName, req, file, cb) => {
     const imageTypes = ["image/jpeg", "image/png", "image/webp"];
@@ -14,7 +14,7 @@ const fileFilter = (folderName, req, file, cb) => {
         ...imageTypes
     ];
 
-    const allowedTypes = folderName === "exhibitor" && file.fieldname === "documents"
+    const allowedTypes = ["exhibitor", "applications"].includes(folderName) && file.fieldname === "documents"
         ? documentTypes
         : imageTypes;
 

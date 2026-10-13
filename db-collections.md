@@ -63,7 +63,7 @@ Indexes: unique index on `email`.
 | `_id` | ObjectId | Yes | Application ID |
 | `expoId` | ObjectId | Yes | Reference to `expos` |
 | `exhibitorId` | ObjectId | Yes | Reference to exhibitor user/profile |
-| `applicationStatus` | String | Yes | `pending`, `approved`, or `rejected` |
+| `applicationStatus` | String | Yes | `applied`, `approved`, or `rejected` |
 | `submittedDocuments` | [String] | No | Application document URLs |
 | `remarks` | String | No | Organizer remarks |
 | `reviewedBy` | ObjectId | No | Reviewing organizer |

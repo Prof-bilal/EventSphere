@@ -6,8 +6,8 @@ const {forFolder} = require("./../middleware/upload");
 const exhibitoroupload = forFolder("exhibitor")
 const router = express.Router();
 
-router.post("/createProfile" , authMiddleware , autharize("admin" , "exhibitor") , exhibitoroupload.fields([{ name: "image", maxCount: 1 }, { name: "documents", maxCount: 10 }]) , exhibitorController.CreateExhibitor);
-router.get("/getexhibitor" , authMiddleware , autharize("admin") , exhibitorController.getExhibitor);
+router.post("/createProfile" , authMiddleware , autharize("exhibitor") , exhibitoroupload.fields([{ name: "image", maxCount: 1 }, { name: "documents", maxCount: 10 }]) , exhibitorController.CreateExhibitor);
+router.get("/getexhibitor" , authMiddleware , autharize("admin" ) , exhibitorController.getExhibitor);
 router.put("/updateexhibitor/:id" , authMiddleware , autharize("exhibitor" ) , exhibitoroupload.fields([{ name: "image", maxCount: 1 }, { name: "documents", maxCount: 10 }]) , exhibitorController.editExhibitor);
 router.delete("/deleteexhibitor/:id" , authMiddleware , autharize("admin" , "exhibitor") , exhibitorController.deleteExhibitor)
 

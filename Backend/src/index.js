@@ -5,6 +5,7 @@ const connectDB = require("./db/db.js");
 const authroutes = require("./routes/authroutes.js");
 const exporoutes = require("./routes/exporoutes.js");
 const exhibitorroutes = require("./routes/exhibitorroutes.js");
+const exhibitorApplicationroutes = require("./routes/exhibitorApplicationroutes.js");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const path = require("path");
@@ -17,8 +18,9 @@ app.use(cookieParser());
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 app.use("/api/auth", authroutes);
-app.use("/api/expo" , exporoutes)
-app.use("/api/exhibitor" , exhibitorroutes);
+app.use("/api/expo", exporoutes)
+app.use("/api/exhibitor", exhibitorroutes);
+app.use("/api/exhibitorApplication", exhibitorApplicationroutes);
 
 connectDB();
 
