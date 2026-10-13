@@ -145,6 +145,22 @@ const rejectApplication = async (req, res) => {
     }
 }
 
+const getMyApplications = async (req, res) => {
+    try {
+        const applications = await ExhibitorApplication.find({
+            exhibitorId: req.user.id
+        }).populate("expoId", "title");
+
+        return res.status(200).json({
+            message: "My applications fetched successfully",
+            applications
+        });
+    } catch (error) {
+        return res.status(500).json({
+            error: error.message
+        });
+    }
+};
 
 module.exports = {
     CreateApplication,
@@ -152,5 +168,6 @@ module.exports = {
     getApplicationById,
     UpdateApplication,
     ApproveApplication,
-    rejectApplication
+    rejectApplication,
+    getMyApplications
 }
