@@ -28,7 +28,8 @@ const CreateApplication = async (req, res) => {
             expoId,
             exhibitorId,
             ApplicationStatus,
-            submittedDocuments
+            submittedDocuments,
+            remarks
         })
 
         res.status(201).json({ message: "Application created successfully", application });
@@ -38,10 +39,10 @@ const CreateApplication = async (req, res) => {
     }
 }
 
-const getApplications = async (req , res) => {
+const getApplications = async (req, res) => {
     try {
         const getApplications = await ExhibitorApplication.find({
-            
+
         }).populate("expoId", "title").populate("exhibitorId", "name");
         res.status(200).json({ message: "Applications fetched successfully", getApplications });
     } catch (error) {
@@ -50,29 +51,106 @@ const getApplications = async (req , res) => {
     }
 }
 
-const getApplicationById = async (req , res) => {
+const getApplicationById = async (req, res) => {
     try {
-        const {id} = req.params;
+        const { id } = req.params;
 
-      
-        const existingAppication = await ExhibitorApplication.findById(id)  .populate("expoId", "title")
+
+        const existingAppication = await ExhibitorApplication.findById(id).populate("expoId", "title")
             .populate("exhibitorId", "name email");
 
-        if(!existingAppication) {
-            return res.status(404).json({message : "Application not found"})
+        if (!existingAppication) {
+            return res.status(404).json({ message: "Application not found" })
         }
 
         return res.status(200).json(existingAppication)
 
     } catch (error) {
-        return res.status(500).json({error : error.message})
+        return res.status(500).json({ error: error.message })
+    }
+}
+
+const UpdateApplication = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { ApplicationStatus } = req.body;
+        const files = req.files?.documents || [];
+        const application = await ExhibitorApplication.findById(id);
+        const submittedDocuments = application.submittedDocuments;
+        const updateFields = {
+            ApplicationStatus,
+            updatedAt: Date.now()
+        }
+
+        if (files.length > 0) {
+            updateFields.submittedDocuments = [...submittedDocuments, ...files.map(file => `/uploads/applications/${file.filename}`)];
+        }
+        const updatedApplication = await ExhibitorApplication.findByIdAndUpdate(id, updateFields, {
+            returnDocument: "after",
+            runValidators: true
+        });
+
+        if (!updatedApplication) {
+            return res.status(404).json({ message: "Application not found" })
+        }
+        return res.status(200).json({ message: "Application updated successfully", updatedApplication });
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+}
+
+const ApproveApplication = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const application = await ExhibitorApplication.findById(id);
+        if (!application) {
+            return res.status(404).json({ message: "Application not found" })
+        }
+        if(application.ApplicationStatus === "Approved" || application.ApplicationStatus === "Rejected") {
+            return res.status(400).json({message : "Application is already approved or rejected"})
+        }
+        application.ApplicationStatus = "Approved";
+        application.reviewedBy = req.user.id;
+        application.remarks = req.body.remarks || application.remarks;
+        application.reviewedAt = Date.now();
+        await application.save();
+        return res.status(200).json({ message: "Application approved successfully", application });
+
+
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+}
+
+const rejectApplication = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const application = await ExhibitorApplication.findById(id);
+        if (!application) {
+            return res.status(404).json({ message: "Application not found" })
+        }
+        if(application.ApplicationStatus === "Approved" || application.ApplicationStatus === "Rejected") {
+            return res.status(400).json({message : "Application is already approved or rejected"})
+        }
+        application.ApplicationStatus = "Rejected";
+        application.reviewedBy = req.user.id;
+        application.remarks = req.body.remarks || application.remarks;
+        application.reviewedAt = Date.now();
+        await application.save();
+        return res.status(200).json({ message: "Application rejected successfully", application });
+
+
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
     }
 }
 
 
-
 module.exports = {
-    CreateApplication ,
-    getApplications ,
-    getApplicationById
+    CreateApplication,
+    getApplications,
+    getApplicationById,
+    UpdateApplication,
+    ApproveApplication,
+    rejectApplication
 }
