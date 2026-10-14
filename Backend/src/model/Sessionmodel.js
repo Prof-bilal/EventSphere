@@ -6,7 +6,7 @@ const SessionSchema = mongoose.Schema({
         required : [true , "Please Enter Session Title"],
         minLength : [3 , "Session Title Should Be At Least 3 Character"],
         maxLength : [100 , "Session Title Should Be At Most 100 Character"],
-        match : [/^a-zA-Z0-9\s]*$/ , "Session Title Should Only Contain Alpha"],
+        match : [/^[a-zA-Z0-9\s]*$/ , "Session Title Should Only Contain Alpha"],
     },
     expoId : {
         type : mongoose.Schema.Types.ObjectId,
@@ -38,14 +38,14 @@ const SessionSchema = mongoose.Schema({
         required : [true , "Please Enter Speaker Name"],
         minLength : [3 , "Speaker Name Should Be At Least 3 Character"],
         maxLength : [100 , "Speaker Name Should Be At Most 100 Character"],
-        match : [/^a-zA-Z\s]*$/ , "Speaker Name Should Only Contain Alpha"],
+        match : [/^[a-zA-Z\s]*$/ , "Speaker Name Should Only Contain Alpha"],
     },
     topic : {
         type : String,
         required : [true , "Please Enter Topic"],
         minLength : [3 , "Topic Should Be At Least 3 Character"],
         maxLength : [100 , "Topic Should Be At Most 100 Character"],
-        match : [/^a-zA-Z0-9\s]*$/ , "Topic Should Only Contain Alpha"],
+        match : [/^[a-zA-Z0-9\s]*$/ , "Topic Should Only Contain Alpha"],
     },
     description : {
         type : String,

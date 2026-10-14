@@ -8,6 +8,7 @@ const exhibitorroutes = require("./routes/exhibitorroutes.js");
 const exhibitorApplicationroutes = require("./routes/exhibitorApplicationroutes.js");
 const boothRoute = require("./routes/BoothRoute.js");
 const sessionsRoute = require("./routes/Sessionsroute.js");
+const expoRegistrationRoute = require("./routes/exporegistrationroutes.js");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const path = require("path");
@@ -25,7 +26,7 @@ app.use("/api/exhibitor", exhibitorroutes);
 app.use("/api/exhibitorApplication", exhibitorApplicationroutes);
 app.use("/api/booth", boothRoute);
 app.use("/api/session", sessionsRoute);
-
+app.use("/api/expoRegistration", expoRegistrationRoute);
 connectDB();
 
 const PORT = process.env.PORT || 5000;
