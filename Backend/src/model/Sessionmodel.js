@@ -21,6 +21,9 @@ const SessionSchema = mongoose.Schema({
         type : mongoose.Schema.Types.ObjectId,
         ref : "Booth",
     },
+    location : {
+        type : String,
+    },
     startDate : {
         type : Date,
         required : [true , "Please Select Start Date"],

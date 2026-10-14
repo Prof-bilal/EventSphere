@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const revokedTokenModel = require("../model/revokesession");
 const { sendEmail, sendPasswordResetEmail } = require("../services/BrevoServices");
+const { notifyUser } = require("../services/NotificationService");
 
 const registerUser = async (req, res) => {
 
@@ -17,6 +18,11 @@ const registerUser = async (req, res) => {
             return res.status(400).json({
                 message: "Public registration is only available for attendees and exhibitors",
             });
+        }
+
+        const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+        if (!passwordPattern.test(password)) {
+            return res.status(400).json({ message: "Please provide a valid password" });
         }
 
         const profileImage = req.file
@@ -82,6 +88,10 @@ const LoginUser = async (req, res) => {
             return res.status(404).json({ message: "Invalid Credentials" });
         }
 
+        if (user.IsBlocked || !user.IsActive) {
+            return res.status(403).json({ message: "Your account is blocked or inactive" });
+        }
+
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
 
@@ -130,6 +140,118 @@ const LoginUser = async (req, res) => {
     }
     catch (error) {
         res.status(500).json({ message: "Error logging in user", error });
+    }
+}
+
+const getPendingExhibitors = async (req, res) => {
+    try {
+        const exhibitors = await User.find({ role: "exhibitor", approvalStatus: "pending" }).select("-password -emailVerificationToken -passwordResetToken");
+        return res.status(200).json(exhibitors);
+    }
+    catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+}
+
+const approveExhibitor = async (req, res) => {
+    try {
+        const exhibitor = await User.findOne({ _id: req.params.id, role: "exhibitor" });
+        if (!exhibitor) {
+            return res.status(404).json({ message: "Exhibitor not found" });
+        }
+        if (exhibitor.approvalStatus === "approved") {
+            return res.status(400).json({ message: "Exhibitor is already approved" });
+        }
+
+        exhibitor.approvalStatus = "approved";
+        await exhibitor.save();
+        await notifyUser(req.app.get("io"), {
+            userId: exhibitor._id,
+            title: "Exhibitor account approved",
+            message: "Your exhibitor account has been approved. You can now log in.",
+            type: "account"
+        });
+
+        return res.status(200).json({ message: "Exhibitor approved successfully", exhibitor });
+    }
+    catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+}
+
+const rejectExhibitor = async (req, res) => {
+    try {
+        const exhibitor = await User.findOne({ _id: req.params.id, role: "exhibitor" });
+        if (!exhibitor) {
+            return res.status(404).json({ message: "Exhibitor not found" });
+        }
+        if (exhibitor.approvalStatus === "rejected") {
+            return res.status(400).json({ message: "Exhibitor is already rejected" });
+        }
+
+        exhibitor.approvalStatus = "rejected";
+        await exhibitor.save();
+        await notifyUser(req.app.get("io"), {
+            userId: exhibitor._id,
+            title: "Exhibitor account rejected",
+            message: req.body.reason || "Your exhibitor account has been rejected.",
+            type: "account"
+        });
+
+        return res.status(200).json({ message: "Exhibitor rejected successfully", exhibitor });
+    }
+    catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+}
+
+const getUsers = async (req, res) => {
+    try {
+        const users = await User.find().select("-password -emailVerificationToken -passwordResetToken");
+        return res.status(200).json(users);
+    }
+    catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+}
+
+const blockUser = async (req, res) => {
+    try {
+        if (req.params.id === req.user.id) {
+            return res.status(400).json({ message: "You cannot block your own account" });
+        }
+
+        const user = await User.findByIdAndUpdate(
+            req.params.id,
+            { IsBlocked: true, IsActive: false, UpdatedAt: Date.now() },
+            { new: true }
+        ).select("-password -emailVerificationToken -passwordResetToken");
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        return res.status(200).json({ message: "User blocked successfully", user });
+    }
+    catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+}
+
+const unblockUser = async (req, res) => {
+    try {
+        const user = await User.findByIdAndUpdate(
+            req.params.id,
+            { IsBlocked: false, IsActive: true, UpdatedAt: Date.now() },
+            { new: true }
+        ).select("-password -emailVerificationToken -passwordResetToken");
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        return res.status(200).json({ message: "User unblocked successfully", user });
+    }
+    catch (error) {
+        return res.status(500).json({ error: error.message });
     }
 }
 
@@ -310,4 +432,4 @@ const ResetPassword = async (req, res) => {
     }
 }
 
-module.exports = { registerUser, LoginUser, LogoutUser, Profile, EditProfile, VerifyEmail, ForgotPassword, ResetPassword };
+module.exports = { registerUser, LoginUser, getPendingExhibitors, approveExhibitor, rejectExhibitor, getUsers, blockUser, unblockUser, LogoutUser, Profile, EditProfile, VerifyEmail, ForgotPassword, ResetPassword };

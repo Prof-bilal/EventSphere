@@ -4,7 +4,7 @@ EventSphere is an event management backend built with Node.js, Express, MongoDB,
 
 ## Project status
 
-Current backend completion: approximately **90%**.
+Current backend status: **functionally complete for the current project requirements**.
 
 Completed modules:
 
@@ -18,8 +18,17 @@ Completed modules:
 - Booth creation, assignment, update, and deletion
 - MongoDB integration
 - Brevo email integration
+- Search and filtering
+- Attendee expo registration and dashboard
+- Session bookmarks
+- Notifications stored in MongoDB
+- Socket.IO real-time notifications
+- User messaging
+- User feedback and admin feedback status management
+- Admin analytics
+- Admin user listing, blocking, and unblocking
 
-Remaining work is mainly attendee-specific features, final validation, complete API testing, and deployment setup.
+This backend is intended for the current project requirements. Production hardening such as rate limiting, advanced logging, automated tests, and deployment configuration can be added later.
 
 ## Requirements
 
@@ -96,6 +105,14 @@ http://localhost:4000/api/expo
 http://localhost:4000/api/exhibitor
 http://localhost:4000/api/exhibitorApplication
 http://localhost:4000/api/booth
+http://localhost:4000/api/session
+http://localhost:4000/api/expoRegistration
+http://localhost:4000/api/bookmark
+http://localhost:4000/api/notification
+http://localhost:4000/api/feedback
+http://localhost:4000/api/message
+http://localhost:4000/api/analytics
+http://localhost:4000/api/attendee
 ```
 
 ## Main API routes
@@ -259,6 +276,152 @@ git switch feature/your-feature-name
 git merge main
 ```
 
+## Complete route list
+
+### Admin user management
+
+```text
+GET /api/auth/pending-exhibitors
+PUT /api/auth/approve-exhibitor/:id
+PUT /api/auth/reject-exhibitor/:id
+GET /api/auth/users
+PUT /api/auth/block-user/:id
+PUT /api/auth/unblock-user/:id
+```
+
+These routes require an admin token.
+
+### Sessions
+
+```text
+POST   /api/session/create-session/:expoId/:boothId
+POST   /api/session/create-session/:expoId/:boothId/:exhibitorId
+GET    /api/session/get-sessions
+GET    /api/session/get-sessions/:expoId
+GET    /api/session/get-session/:id
+PUT    /api/session/update-session/:id
+DELETE /api/session/delete-session/:id
+```
+
+Sessions can be created by admins or exhibitors. Attendees must be registered for the expo before accessing its protected session list.
+
+### Expo registration
+
+```text
+POST /api/expoRegistration/register/:expoId
+GET  /api/expoRegistration/register
+GET  /api/expoRegistration/register/:expoId
+PUT  /api/expoRegistration/register/:id
+PUT  /api/expoRegistration/register/attend/:id
+GET  /api/expoRegistration/register/attendeeCount/:expoId
+```
+
+### Bookmarks
+
+```text
+POST   /api/bookmark/:sessionId
+GET    /api/bookmark
+DELETE /api/bookmark/:sessionId
+```
+
+### Notifications
+
+```text
+POST /api/notification
+GET  /api/notification
+PUT  /api/notification/:id/read
+```
+
+Notifications are saved in MongoDB, emitted through Socket.IO with the `notification:new` event, and sent through Brevo where applicable.
+
+### Feedback
+
+```text
+POST /api/feedback
+GET  /api/feedback
+PUT  /api/feedback/:id/status
+```
+
+### Messages
+
+```text
+POST /api/message
+GET  /api/message/conversation/:userId
+```
+
+### Search
+
+```text
+GET /api/expo/getExpo
+GET /api/exhibitor/search
+```
+
+Use the query parameters supported by the controller for title, location, status, and exhibitor search filters.
+
+### Dashboards and analytics
+
+```text
+GET /api/attendee/dashboard
+GET /api/analytics/:expoId
+```
+
+The attendee dashboard requires an attendee token. Analytics requires an admin token.
+
+## Upload requests
+
+Use `multipart/form-data` in Postman for upload routes.
+
+Exhibitor profile fields:
+
+```text
+image       one logo image
+documents   one or more PDF, DOC, DOCX, JPG, PNG, or WEBP files
+```
+
+Exhibitor application fields:
+
+```text
+documents   one or more application documents
+```
+
+Uploaded files are served from:
+
+```text
+http://localhost:4000/uploads/<folder>/<filename>
+```
+
+## Socket.IO connection
+
+The frontend connects with the logged-in user's JWT:
+
+```js
+const socket = io("http://localhost:4000", {
+    auth: { token: YOUR_TOKEN }
+});
+
+socket.on("notification:new", (notification) => {
+    console.log(notification);
+});
+```
+
+## Development checklist
+
+Before opening a Pull Request:
+
+```bash
+npm install
+npm run dev
+```
+
+Then verify the changed API in Postman, check the terminal for errors, and run:
+
+```bash
+git diff
+git status
+```
+
+Do not commit `.env`, API keys, passwords, JWT tokens, `node_modules`, or private uploaded files.
+
 If Git reports conflicts, fix the marked files, then run:
 
 ```bash
@@ -275,4 +438,3 @@ git push
 - Test new endpoints in Postman.
 - Use meaningful branch and commit names.
 - Pull the latest `main` before starting new work.
-

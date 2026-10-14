@@ -1,6 +1,7 @@
 const Registration = require("../model/expoRegistrationsmodel");
 const Expo = require("../model/expomodel");
 const User = require("../model/Usermodel");
+const { notifyUser } = require("../services/NotificationService");
 
 const registerForExpo = async (req, res) => {
     try {
@@ -34,6 +35,13 @@ const registerForExpo = async (req, res) => {
             attendeeId,
             registrationNumber,
             status: "registered"
+        });
+        await notifyUser(req.app.get("io"), {
+            userId: attendeeId,
+            title: "Expo registration successful",
+            message: `You are registered for ${expo.title}.`,
+            type: "registration",
+            relatedExpoId: expoId
         });
 
         return res.status(201).json({ message: "Registered for expo successfully", registration });

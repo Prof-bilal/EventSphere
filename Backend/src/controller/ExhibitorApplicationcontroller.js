@@ -1,8 +1,8 @@
 const ExhibitorApplication = require("../model/exhibitorApplicationmodel");
+const { notifyUser } = require("../services/NotificationService");
 
 const CreateApplication = async (req, res) => {
     try {
-        const { ApplicationStatus } = req.body;
         const files = req.files?.documents || [];
         if (files.length === 0) {
             return res.status(400).json({ message: "Documents are required" });
@@ -27,9 +27,8 @@ const CreateApplication = async (req, res) => {
         const application = await ExhibitorApplication.create({
             expoId,
             exhibitorId,
-            ApplicationStatus,
-            submittedDocuments,
-            remarks
+            ApplicationStatus: "Applied",
+            submittedDocuments
         })
 
         res.status(201).json({ message: "Application created successfully", application });
@@ -62,6 +61,9 @@ const getApplicationById = async (req, res) => {
         if (!existingAppication) {
             return res.status(404).json({ message: "Application not found" })
         }
+        if (req.user.role !== "admin" && existingAppication.exhibitorId.toString() !== req.user.id) {
+            return res.status(403).json({ message: "You can only view your own application" });
+        }
 
         return res.status(200).json(existingAppication)
 
@@ -76,6 +78,12 @@ const UpdateApplication = async (req, res) => {
         const { ApplicationStatus } = req.body;
         const files = req.files?.documents || [];
         const application = await ExhibitorApplication.findById(id);
+        if (!application) {
+            return res.status(404).json({ message: "Application not found" });
+        }
+        if (req.user.role !== "admin" && application.exhibitorId.toString() !== req.user.id) {
+            return res.status(403).json({ message: "You can only update your own application" });
+        }
         const submittedDocuments = application.submittedDocuments;
         const updateFields = {
             ApplicationStatus,
@@ -115,6 +123,13 @@ const ApproveApplication = async (req, res) => {
         application.remarks = req.body.remarks || application.remarks;
         application.reviewedAt = Date.now();
         await application.save();
+        await notifyUser(req.app.get("io"), {
+            userId: application.exhibitorId,
+            title: "Exhibitor application approved",
+            message: "Your exhibitor application has been approved.",
+            type: "application",
+            relatedExpoId: application.expoId
+        });
         return res.status(200).json({ message: "Application approved successfully", application });
 
 
@@ -138,6 +153,13 @@ const rejectApplication = async (req, res) => {
         application.remarks = req.body.remarks || application.remarks;
         application.reviewedAt = Date.now();
         await application.save();
+        await notifyUser(req.app.get("io"), {
+            userId: application.exhibitorId,
+            title: "Exhibitor application rejected",
+            message: application.remarks || "Your exhibitor application has been rejected.",
+            type: "application",
+            relatedExpoId: application.expoId
+        });
         return res.status(200).json({ message: "Application rejected successfully", application });
 
 

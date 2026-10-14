@@ -122,4 +122,37 @@ const sendPasswordResetEmail = async (to, name , resetToken) => {
     }
 }
 
-module.exports = { sendEmail, sendPasswordResetEmail };
+const sendNotificationEmail = async (to, name, subject, title, message) => {
+  try {
+    const response = await brevoClient.transactionalEmails.sendTransacEmail({
+      sender: {
+        email: process.env.BREVO_SENDER_EMAIL,
+        name: process.env.BREVO_SENDER_NAME || "EventSphere",
+      },
+      to: [
+        {
+          email: to,
+          name: name,
+        },
+      ],
+      subject,
+      htmlContent: `
+        <!DOCTYPE html>
+        <html>
+          <body style="font-family: Arial, sans-serif;">
+            <h2>${title}</h2>
+            <p>Hi ${name},</p>
+            <p>${message}</p>
+            <p>EventSphere</p>
+          </body>
+        </html>
+      `,
+    });
+    return response;
+  } catch (error) {
+    console.error("BREVO NOTIFICATION ERROR:", error.message);
+    return null;
+  }
+};
+
+module.exports = { sendEmail, sendPasswordResetEmail, sendNotificationEmail };

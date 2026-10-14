@@ -19,7 +19,6 @@ const userSchema = new mongoose.Schema({
         required: [true, "Password is required"],
         minlength: [6, "Password must be at least 6 characters long"],
         maxlength: [90, "Password cannot exceed 90 characters"],
-        match : ["^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$" , "Please provide a valid password" ]
     },
     phone: {
         type: String,

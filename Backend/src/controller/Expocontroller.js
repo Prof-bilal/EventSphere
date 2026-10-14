@@ -1,4 +1,6 @@
 const Expo = require('../model/expomodel');
+const Registration = require('../model/expoRegistrationsmodel');
+const { notifyUser } = require('../services/NotificationService');
 
 const createExpo = async (req, res) => {
     try {
@@ -36,7 +38,24 @@ const createExpo = async (req, res) => {
 
 const getExpo = async (req, res) => {
     try {
-        const expo = await Expo.find().populate("organizerId", "name email")
+        const { search, status, location } = req.query;
+        const filter = {};
+
+        if (search) {
+            filter.$or = [
+                { title: { $regex: search, $options: "i" } },
+                { description: { $regex: search, $options: "i" } },
+                { theme: { $regex: search, $options: "i" } }
+            ];
+        }
+        if (status) {
+            filter.status = status;
+        }
+        if (location) {
+            filter.location = { $regex: location, $options: "i" };
+        }
+
+        const expo = await Expo.find(filter).populate("organizerId", "name email")
 
         res.status(200).json(expo)
     } catch (error) {
@@ -97,6 +116,15 @@ const updateExpo = async (req, res) => {
             id, updateddata, {updatedAt : Date.now(), returnDocument: "after", runValidators: true }
         )
 
+        const registrations = await Registration.find({ expoId: id, status: "registered" }).select("attendeeId");
+        await Promise.all(registrations.map((registration) => notifyUser(req.app.get("io"), {
+            userId: registration.attendeeId,
+            title: "Expo updated",
+            message: `${existingExpo.title} has been updated.`,
+            type: "expo",
+            relatedExpoId: id
+        })));
+
 
 
         return res.status(200).json({
@@ -129,7 +157,16 @@ const deleteExpo = async (req, res) => {
             });
         }
 
+        const registrations = await Registration.find({ expoId: id, status: "registered" }).select("attendeeId");
         await Expo.findByIdAndDelete(id)
+
+        await Promise.all(registrations.map((registration) => notifyUser(req.app.get("io"), {
+            userId: registration.attendeeId,
+            title: "Expo cancelled",
+            message: `${existingexpo.title} has been cancelled.`,
+            type: "expo",
+            relatedExpoId: id
+        })));
 
         return res.status(200).json({ message: "Expo deleted successfully" })
 

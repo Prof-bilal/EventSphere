@@ -1,6 +1,6 @@
 # EventSphere
 
-EventSphere is an event-management application with a React frontend and a Node.js/Express backend. It helps organizers manage expos, exhibitors, applications, booths, and attendees.
+EventSphere is an event-management application with a React frontend and a Node.js/Express backend. It helps admins manage expos, exhibitors, applications, booths, sessions, attendees, notifications, messages, feedback, and analytics.
 
 This guide is written for beginners setting up the project for the first time.
 
@@ -60,6 +60,68 @@ npm run dev
 
 The API normally runs at http://localhost:4000. For routes and Postman examples, read [Backend/README.md](Backend/README.md).
 
+## Backend status
+
+The backend is functionally complete for the current project requirements. It includes:
+
+- JWT authentication, email verification, password reset, and logout
+- Admin, exhibitor, and attendee roles
+- Admin approval and blocking of users and exhibitors
+- Expo, booth, exhibitor profile, and exhibitor application management
+- Sessions, attendee expo registration, bookmarks, feedback, messaging, and analytics
+- Profile, logo, and document uploads
+- Brevo email notifications and Socket.IO real-time notifications
+
+This is a project backend, not a production deployment. Rate limiting, advanced logging, automated tests, and deployment hardening can be added later.
+
+## Main API prefixes
+
+```text
+/api/auth
+/api/expo
+/api/exhibitor
+/api/exhibitorApplication
+/api/booth
+/api/session
+/api/expoRegistration
+/api/bookmark
+/api/notification
+/api/feedback
+/api/message
+/api/analytics
+/api/attendee
+```
+
+Most protected requests require:
+
+```text
+Authorization: Bearer YOUR_TOKEN
+```
+
+Use `multipart/form-data` for requests containing images or documents. Use JSON for normal requests.
+
+## Roles
+
+- **Admin:** creates expos and booths, assigns booths, manages users, approves exhibitors and applications, manages sessions, feedback, and analytics.
+- **Exhibitor:** creates a profile, uploads documents, applies for expos, views assigned booths, and creates sessions.
+- **Attendee:** registers for expos, views sessions, bookmarks sessions, sends messages, and submits feedback.
+
+## Real-time notifications
+
+The backend uses Socket.IO. The frontend connects with the JWT:
+
+```js
+const socket = io("http://localhost:4000", {
+  auth: { token: YOUR_TOKEN }
+});
+
+socket.on("notification:new", (notification) => {
+  console.log(notification);
+});
+```
+
+Notifications are stored in MongoDB and important notifications are sent through Brevo.
+
 ## 3. Set up the frontend
 
 Open a second terminal from the project root:
@@ -109,7 +171,29 @@ Then open a pull request on GitHub. Do not commit .env, passwords, API keys, tok
 - **The frontend cannot reach the API:** make sure the backend is running and its CORS/frontend URL settings match your local frontend URL.
 - **A page works through navigation but not after refresh:** configure the deployed frontend server to return index.html for client-side routes.
 
+## API testing
+
+Use Postman to test the backend:
+
+1. Start MongoDB and the backend.
+2. Test `POST /api/auth/login`.
+3. Copy the returned token.
+4. Add it as a Bearer token to protected requests.
+5. Use an admin, exhibitor, or attendee account according to the route requirement.
+6. Use form-data for uploads and JSON for normal requests.
+
+The backend root health check is:
+
+```text
+GET http://localhost:4000/
+```
+
+Expected response:
+
+```text
+Hello World
+```
+
 ## More project notes
 
 See [requirements.md](requirements.md), [roadmap-checklist.md](roadmap-checklist.md), [roles-workflows-api.md](roles-workflows-api.md), and [db-collections.md](db-collections.md) for additional documentation.
-

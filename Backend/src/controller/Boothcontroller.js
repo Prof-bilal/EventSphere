@@ -1,6 +1,7 @@
 const Booth = require("../model/boothmodel");
 const Expo = require("../model/expomodel");
 const User = require("../model/Usermodel");
+const { notifyUser } = require("../services/NotificationService");
 
 
 const createBooth = async (req, res) => {
@@ -54,6 +55,13 @@ const assignBooth = async (req, res) => {
         booth.exhibitorId = exhibitorId;
         booth.status = "booked";
         await booth.save();
+        await notifyUser(req.app.get("io"), {
+            userId: exhibitorId,
+            title: "Booth assigned",
+            message: `Booth ${booth.boothNumber} has been assigned to you.`,
+            type: "booth",
+            relatedExpoId: booth.expoId
+        });
         return res.status(200).json({ message: "Booth assigned successfully", booth });
     }
     catch (error) {

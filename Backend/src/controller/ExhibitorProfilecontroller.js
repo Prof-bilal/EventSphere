@@ -41,6 +41,27 @@ const getExhibitor = async (req, res) => {
     }
 }
 
+const searchExhibitor = async (req, res) => {
+    try {
+        const { search } = req.query;
+        const filter = search
+            ? {
+                $or: [
+                    { CompanyName: { $regex: search, $options: "i" } },
+                    { products: { $regex: search, $options: "i" } },
+                    { services: { $regex: search, $options: "i" } }
+                ]
+            }
+            : {};
+
+        const exhibitors = await Exhibitor.find(filter).populate("UserId", "name email");
+        return res.status(200).json(exhibitors);
+    }
+    catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+}
+
 const editExhibitor = async (req, res) => {
     try {
         const { id } = req.params;
@@ -118,4 +139,4 @@ const deleteExhibitor = async (req, res) => {
 }
 
 
-module.exports = { CreateExhibitor, getExhibitor, editExhibitor , deleteExhibitor }
+module.exports = { CreateExhibitor, getExhibitor, searchExhibitor, editExhibitor , deleteExhibitor }

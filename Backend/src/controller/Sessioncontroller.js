@@ -3,12 +3,14 @@ const Expo = require("../model/expomodel");
 const Booth = require("../model/boothmodel");
 const User = require("../model/Usermodel")
 const Registration = require("../model/expoRegistrationsmodel");
+const { notifyUser } = require("../services/NotificationService");
 const CreateSession = async (req , res) => {
     try {
-        const {title , startDate , startTime , endTime , speakerName , topic , description , sessionType , capacity , fee} = req.body;
+        const {title , startDate , startTime , endTime , speakerName , topic , description , sessionType , capacity , fee, location} = req.body;
         const expoId = req.params.expoId;
         const boothId = req.params.boothId;
-        const exhibitorId = req.params.exhibitorId;
+        const requestedExhibitorId = req.params.exhibitorId;
+        let exhibitorId = null;
 
         const expo = await Expo.findById(expoId);
         if(!expo){
@@ -18,10 +20,28 @@ const CreateSession = async (req , res) => {
         if(!booth){
             return res.status(404).json({message : "Booth Not Found"});
         }
+        if (booth.expoId.toString() !== expoId) {
+            return res.status(400).json({ message: "Booth does not belong to this expo" });
+        }
+        if (req.user.role === "exhibitor") {
+            exhibitorId = req.user.id;
+            if (requestedExhibitorId && requestedExhibitorId !== exhibitorId) {
+                return res.status(403).json({ message: "You can only create sessions for yourself" });
+            }
+            if (!booth.exhibitorId || booth.exhibitorId.toString() !== exhibitorId) {
+                return res.status(403).json({ message: "You can only create a session for your assigned booth" });
+            }
+        }
+        else if (requestedExhibitorId) {
+            exhibitorId = requestedExhibitorId;
+        }
         if(exhibitorId){
-            const exhibitor = await User.findById(exhibitorId);
+            const exhibitor = await User.findOne({ _id: exhibitorId, role: "exhibitor" });
             if(!exhibitor){
                 return res.status(404).json({message : "Exhibitor Not Found"});
+            }
+            if (!booth.exhibitorId || booth.exhibitorId.toString() !== exhibitorId) {
+                return res.status(400).json({ message: "Booth is not assigned to this exhibitor" });
             }
         }
         const session = new Sessions({
@@ -37,9 +57,18 @@ const CreateSession = async (req , res) => {
             description,
             sessionType,
             capacity,
-            fee
+            fee,
+            location
         })
         const savedSession = await session.save();
+        const registrations = await Registration.find({ expoId, status: "registered" }).select("attendeeId");
+        await Promise.all(registrations.map((registration) => notifyUser(req.app.get("io"), {
+            userId: registration.attendeeId,
+            title: "New session available",
+            message: `${savedSession.title} is now available in your Expo schedule.`,
+            type: "session",
+            relatedExpoId: expoId
+        })));
         res.status(201).json(savedSession);
     }
     catch (error) {
@@ -105,12 +134,15 @@ const getSessionById = async (req , res) => {
 const updateSession = async (req , res) => {
     try {
         const {id} = req.params;
-        const {title , startDate , startTime , endTime , speakerName , topic , description , sessionType , capacity , fee} = req.body;
+        const {title , startDate , startTime , endTime , speakerName , topic , description , sessionType , capacity , fee, location} = req.body;
         const session = await Sessions.findById(id);
         if(!session){
             return res.status(404).json({message : "Session Not Found"});
         }
-        const updatedSession = await Sessions.findByIdAndUpdate(id, {title , startDate , startTime , endTime , speakerName , topic , description , sessionType , capacity , fee , updatedAt : Date.now()} , {new : true , runValidators : true});
+        if (req.user.role === "exhibitor" && (!session.exhibitorId || session.exhibitorId.toString() !== req.user.id)) {
+            return res.status(403).json({ message: "You can only update your own sessions" });
+        }
+        const updatedSession = await Sessions.findByIdAndUpdate(id, {title , startDate , startTime , endTime , speakerName , topic , description , sessionType , capacity , fee, location, updatedAt : Date.now()} , {new : true , runValidators : true});
         res.status(200).json(updatedSession);
     }
     catch (error) {
@@ -124,6 +156,9 @@ const deleteSession = async (req , res) => {
         const session = await Sessions.findById(id);
         if(!session){
             return res.status(404).json({message : "Session Not Found"});
+        }
+        if (req.user.role === "exhibitor" && (!session.exhibitorId || session.exhibitorId.toString() !== req.user.id)) {
+            return res.status(403).json({ message: "You can only delete your own sessions" });
         }
         await Sessions.findByIdAndDelete(id);
         res.status(200).json({message : "Session Deleted Successfully"});
