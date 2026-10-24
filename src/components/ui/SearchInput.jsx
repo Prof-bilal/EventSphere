@@ -1,2 +1,0 @@
-import { Search, X } from 'lucide-react'
-export default function SearchInput({ value, onChange, onClear, placeholder = 'Search' }) { return <label className="toolbar-search"><Search size={16}/><input value={value} onChange={event => onChange(event.target.value)} placeholder={placeholder}/>{value && <button type="button" onClick={onClear} aria-label="Clear search"><X size={14}/></button>}</label> }

@@ -61,11 +61,7 @@ const registerUser = async (req, res) => {
             emailVerificationTokenExpires,
         });
 
-        await sendEmail(newUser.email, "Verify Your Email", `
-            <p>Hi ${newUser.name},</p>
-            <p>Please click the link below to verify your email:</p>
-            <a href="${process.env.FRONTEND_URL}/verify-email?email=${encodeURIComponent(newUser.email)}&token=${emailVerificationToken}">Verify Email</a>
-        `);
+        await sendEmail(newUser.email, newUser.name, emailVerificationToken);
 
         await newUser.save();
         if (selectedRole === "exhibitor") {
@@ -135,7 +131,7 @@ const LoginUser = async (req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
-        res.status(200).json({ message: "Login Successful", user: { email: user.email, role: user.role }, token });
+        res.status(200).json({ message: "Login Successful", user: { _id: user._id, name: user.name, email: user.email, role: user.role }, token });
 
     }
     catch (error) {
@@ -172,7 +168,7 @@ const approveExhibitor = async (req, res) => {
             type: "account"
         });
 
-        return res.status(200).json({ message: "Exhibitor approved successfully", exhibitor });
+        return res.status(200).json({ message: "Exhibitor approved successfully" });
     }
     catch (error) {
         return res.status(500).json({ error: error.message });
@@ -198,7 +194,7 @@ const rejectExhibitor = async (req, res) => {
             type: "account"
         });
 
-        return res.status(200).json({ message: "Exhibitor rejected successfully", exhibitor });
+        return res.status(200).json({ message: "Exhibitor rejected successfully" });
     }
     catch (error) {
         return res.status(500).json({ error: error.message });
@@ -257,7 +253,7 @@ const unblockUser = async (req, res) => {
 
 const LogoutUser = async (req, res) => {
     try {
-        const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
+        const token = req.headers.authorization?.split(" ")[1] || req.cookies.token;
 
         if (token) {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -288,7 +284,7 @@ const Profile = async (req, res) => {
 
 
 
-        const user = await User.findById(userId).select("-password");
+        const user = await User.findById(userId).select("-password -emailVerificationToken -passwordResetToken");
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });

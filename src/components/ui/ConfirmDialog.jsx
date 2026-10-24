@@ -1,2 +1,0 @@
-import Modal from './Modal'
-export default function ConfirmDialog({ title, children, confirmLabel = 'Confirm', onConfirm, onClose }) { return <Modal onClose={onClose} labelledBy="confirm-dialog-title"><h2 id="confirm-dialog-title">{title}</h2><p className="modal-copy">{children}</p><div className="modal-actions"><button className="outline-button" onClick={onClose}>Cancel</button><button className="dash-primary" onClick={onConfirm}>{confirmLabel}</button></div></Modal> }

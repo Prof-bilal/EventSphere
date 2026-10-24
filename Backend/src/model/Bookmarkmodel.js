@@ -14,7 +14,8 @@ const bookmarkSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
-    }
+    },
+    reminderSentAt: { type: Date, default: null }
 });
 
 bookmarkSchema.index({ attendeeId: 1, sessionId: 1 }, { unique: true });

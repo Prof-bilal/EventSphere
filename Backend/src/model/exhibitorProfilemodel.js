@@ -6,14 +6,14 @@ const exhibitorProfileSchema = mongoose.Schema({
         required: [true, "Please Provide Company Name "],
         minlength: [3, "Please Enter more then 3 characters"],
         maxlength: [50, "Please Enter under 50 characters"],
-        match: /^[a-zA-Z]+$/
+        trim: true
     },
     description: {
         type: String,
         required: [true, "Please provide description"],
         minlength: [10, "Please Enter more then 10 Characters"],
-        maxlength: [100, "Please Ender under 100 characters"],
-        match: /^[a-zA-Z]+$/
+        maxlength: [1000, "Description must be under 1000 characters"],
+        trim: true
     },
     products: {
         type: String,
@@ -36,13 +36,14 @@ const exhibitorProfileSchema = mongoose.Schema({
         minlength: [3, "Please Enter 3 characters long"]
     },
     phone: {
-        type: Number,
+        type: String,
         required: [true, "Please Provide contact person contact no"]
     },
     documents: {
         type: [String],
         default: []
     },
+    category: { type: String, default: "General" },
     createdAt: {
         type: Date,
         default: Date.now

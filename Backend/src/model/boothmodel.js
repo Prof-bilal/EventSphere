@@ -68,6 +68,11 @@ const boothSchema = new mongoose.Schema({
         enum : ["available" , "booked"],
         default : "available"
     },
+    requestedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    products: { type: String, default: "" },
+    services: { type: String, default: "" },
+    staff: { type: String, default: "" },
+    visits: { type: Number, default: 0 },
     createdAt : {
         type : Date,
         default : Date.now

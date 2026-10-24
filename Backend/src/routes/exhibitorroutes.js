@@ -5,6 +5,7 @@ const autharize = require("./../middleware/rolemiddleware");
 const {forFolder} = require("./../middleware/upload");
 const exhibitoroupload = forFolder("exhibitor")
 const router = express.Router();
+router.get("/my-profile", authMiddleware, autharize("exhibitor"), require("../controller/Portalcontroller").getMyProfile);
 
 router.post("/createProfile" , authMiddleware , autharize("exhibitor") , exhibitoroupload.fields([{ name: "image", maxCount: 1 }, { name: "documents", maxCount: 10 }]) , exhibitorController.CreateExhibitor);
 router.get("/getexhibitor" , authMiddleware , autharize("admin" ) , exhibitorController.getExhibitor);

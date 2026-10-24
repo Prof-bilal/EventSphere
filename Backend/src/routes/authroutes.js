@@ -5,6 +5,7 @@ const authorize = require("./../middleware/rolemiddleware");
 const userUpload = forFolder("users");
 const express = require("express");
 const router = express.Router();
+router.post("/resend-verification", require("../controller/Verificationcontroller").resendEmail);
 
 router.post("/register" ,userUpload.single("profilePicture"), UserController.registerUser);
 router.post("/login" , UserController.LoginUser);

@@ -4,6 +4,8 @@ const ExhibitorApplication = require("../model/exhibitorApplicationmodel");
 const Booth = require("../model/boothmodel");
 const Sessions = require("../model/Sessionmodel");
 const Feedback = require("../model/Feedbackmodel");
+const SessionRegistration = require("../model/SessionRegistrationmodel");
+const Bookmark = require("../model/Bookmarkmodel");
 
 const getAnalytics = async (req, res) => {
     try {
@@ -23,6 +25,13 @@ const getAnalytics = async (req, res) => {
             Feedback.countDocuments({ expoId })
         ]);
 
+        const sessionList = await Sessions.find({ expoId });
+        const popularity = await Promise.all(sessionList.map(async session => ({
+            title: session.title,
+            registrations: await SessionRegistration.countDocuments({ sessionId: session._id }),
+            bookmarks: await Bookmark.countDocuments({ sessionId: session._id })
+        })));
+        const boothTraffic = await Booth.find({ expoId }).select("boothNumber visits");
         return res.status(200).json({
             expo: { id: expo._id, title: expo.title },
             attendees,
@@ -31,7 +40,9 @@ const getAnalytics = async (req, res) => {
             availableBooths,
             bookedBooths,
             sessions,
-            feedback
+            feedback,
+            popularity,
+            boothTraffic
         });
     }
     catch (error) {

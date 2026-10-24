@@ -1,0 +1,61 @@
+import {
+  Activity,
+  Bell,
+  Bookmark,
+  Building2,
+  CalendarDays,
+  ClipboardList,
+  Grid3X3,
+  LayoutDashboard,
+  MessageCircle,
+  ScanLine,
+  Star,
+  UserCircle,
+  UserCog,
+} from 'lucide-react'
+
+export const roleDetails = {
+  organizer: {
+    label: 'Organizer',
+    nav: [
+      ['overview', 'Overview', LayoutDashboard],
+      ['expos', 'Expos', Building2],
+      ['applications', 'Applications', ClipboardList],
+      ['booths', 'Booths', Grid3X3],
+      ['sessions', 'Sessions', CalendarDays],
+      ['registrations', 'Registrations', UserCog],
+      ['attendance', 'Attendance', ScanLine],
+      ['users', 'User management', UserCog],
+      ['analytics', 'Analytics', Activity],
+      ['feedback', 'Feedback', Star],
+      ['notifications', 'Notifications', Bell],
+    ],
+  },
+  exhibitor: {
+    label: 'Exhibitor',
+    nav: [
+      ['overview', 'Overview', LayoutDashboard],
+      ['profile', 'Company profile', UserCircle],
+      ['expos', 'Find expos', Building2],
+      ['applications', 'Applications', ClipboardList],
+      ['booths', 'Booth', Grid3X3],
+      ['sessions', 'Schedule', CalendarDays],
+      ['messages', 'Messages', MessageCircle],
+      ['feedback', 'Feedback', Star],
+      ['notifications', 'Notifications', Bell],
+    ],
+  },
+  attendee: {
+    label: 'Attendee',
+    nav: [
+      ['overview', 'Overview', LayoutDashboard],
+      ['expos', 'Explore expos', Building2],
+      ['exhibitors', 'Exhibitors', UserCog],
+      ['booths', 'Floor plan', Grid3X3],
+      ['sessions', 'Schedule', CalendarDays],
+      ['bookmarks', 'My plans', Bookmark],
+      ['feedback', 'Feedback', Star],
+      ['notifications', 'Notifications', Bell],
+    ],
+  },
+}

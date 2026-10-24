@@ -16,11 +16,17 @@ const CreateSession = async (req , res) => {
         if(!expo){
             return res.status(404).json({message : "Expo Not Found"});
         }
-        const booth = await Booth.findById(boothId);
-        if(!booth){
+        if (startTime >= endTime) return res.status(400).json({ message: "End time must be after start time" });
+        if (new Date(startDate) < new Date(expo.startDate) || new Date(startDate) > new Date(expo.endDate)) {
+            return res.status(400).json({ message: "Session date must be within the expo dates" });
+        }
+        const conflict = await Sessions.findOne({ expoId, startDate, location, startTime: { $lt: endTime }, endTime: { $gt: startTime } });
+        if (conflict) return res.status(400).json({ message: "Another session uses this location at that time" });
+        const booth = boothId ? await Booth.findById(boothId) : null;
+        if(boothId && !booth){
             return res.status(404).json({message : "Booth Not Found"});
         }
-        if (booth.expoId.toString() !== expoId) {
+        if (booth && booth.expoId.toString() !== expoId) {
             return res.status(400).json({ message: "Booth does not belong to this expo" });
         }
         if (req.user.role === "exhibitor") {
@@ -28,7 +34,7 @@ const CreateSession = async (req , res) => {
             if (requestedExhibitorId && requestedExhibitorId !== exhibitorId) {
                 return res.status(403).json({ message: "You can only create sessions for yourself" });
             }
-            if (!booth.exhibitorId || booth.exhibitorId.toString() !== exhibitorId) {
+            if (!booth || !booth.exhibitorId || booth.exhibitorId.toString() !== exhibitorId) {
                 return res.status(403).json({ message: "You can only create a session for your assigned booth" });
             }
         }
@@ -40,7 +46,7 @@ const CreateSession = async (req , res) => {
             if(!exhibitor){
                 return res.status(404).json({message : "Exhibitor Not Found"});
             }
-            if (!booth.exhibitorId || booth.exhibitorId.toString() !== exhibitorId) {
+            if (!booth || !booth.exhibitorId || booth.exhibitorId.toString() !== exhibitorId) {
                 return res.status(400).json({ message: "Booth is not assigned to this exhibitor" });
             }
         }
@@ -48,7 +54,7 @@ const CreateSession = async (req , res) => {
             title,
             expoId,
             exhibitorId,
-            boothId,
+            boothId: boothId || undefined,
             startDate,
             startTime,
             endTime,
@@ -61,6 +67,7 @@ const CreateSession = async (req , res) => {
             location
         })
         const savedSession = await session.save();
+        req.app.get("io")?.emit("event:updated", { expoId });
         const registrations = await Registration.find({ expoId, status: "registered" }).select("attendeeId");
         await Promise.all(registrations.map((registration) => notifyUser(req.app.get("io"), {
             userId: registration.attendeeId,
@@ -78,7 +85,8 @@ const CreateSession = async (req , res) => {
 
 const getSessions = async (req , res) => {
     try {
-        const sessions = await Sessions.find();
+        const filter = req.query.expoId ? { expoId: req.query.expoId } : {};
+        const sessions = await Sessions.find(filter).populate("expoId", "title");
         if(!sessions){
             return res.status(404).json({message : "Sessions Not Found"});
         }
@@ -142,7 +150,17 @@ const updateSession = async (req , res) => {
         if (req.user.role === "exhibitor" && (!session.exhibitorId || session.exhibitorId.toString() !== req.user.id)) {
             return res.status(403).json({ message: "You can only update your own sessions" });
         }
+        if (startTime >= endTime) return res.status(400).json({ message: "End time must be after start time" });
+        const expo = await Expo.findById(session.expoId);
+        if (new Date(startDate) < new Date(expo.startDate) || new Date(startDate) > new Date(expo.endDate)) return res.status(400).json({ message: "Session date must be within expo dates" });
+        const conflict = await Sessions.findOne({ _id: { $ne: id }, expoId: session.expoId, startDate, location, startTime: { $lt: endTime }, endTime: { $gt: startTime } });
+        if (conflict) return res.status(400).json({ message: "Another session uses this location at that time" });
         const updatedSession = await Sessions.findByIdAndUpdate(id, {title , startDate , startTime , endTime , speakerName , topic , description , sessionType , capacity , fee, location, updatedAt : Date.now()} , {new : true , runValidators : true});
+        const registrations = await Registration.find({ expoId: session.expoId, status: "registered" });
+        await Promise.all(registrations.map(item => notifyUser(req.app.get("io"), {
+            userId: item.attendeeId, title: "Schedule updated", message: `${updatedSession.title} has been updated. Check the latest schedule.`, type: "session", relatedExpoId: session.expoId, email: false
+        })));
+        req.app.get("io")?.emit("event:updated", { expoId: session.expoId });
         res.status(200).json(updatedSession);
     }
     catch (error) {
@@ -161,6 +179,9 @@ const deleteSession = async (req , res) => {
             return res.status(403).json({ message: "You can only delete your own sessions" });
         }
         await Sessions.findByIdAndDelete(id);
+        await require("../model/SessionRegistrationmodel").deleteMany({ sessionId: id });
+        await require("../model/Bookmarkmodel").deleteMany({ sessionId: id });
+        req.app.get("io")?.emit("event:updated", { expoId: session.expoId });
         res.status(200).json({message : "Session Deleted Successfully"});
     }
     catch (error) {

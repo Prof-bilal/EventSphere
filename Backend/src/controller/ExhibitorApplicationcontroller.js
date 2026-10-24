@@ -1,5 +1,7 @@
 const ExhibitorApplication = require("../model/exhibitorApplicationmodel");
 const { notifyUser } = require("../services/NotificationService");
+const Expo = require("../model/expomodel");
+const Profile = require("../model/exhibitorProfilemodel");
 
 const CreateApplication = async (req, res) => {
     try {
@@ -17,6 +19,10 @@ const CreateApplication = async (req, res) => {
         if (!exhibitorId) {
             return res.status(400).json({ message: "Exhibitor not found" });
         }
+        const expo = await Expo.findById(expoId);
+        if (!expo || expo.status !== "published") return res.status(400).json({ message: "Expo is not accepting applications" });
+        const profile = await Profile.findOne({ UserId: exhibitorId });
+        if (!profile) return res.status(400).json({ message: "Create your company profile before applying" });
         const existingApplication = await ExhibitorApplication.findOne({
             expoId,
             exhibitorId
@@ -30,6 +36,7 @@ const CreateApplication = async (req, res) => {
             ApplicationStatus: "Applied",
             submittedDocuments
         })
+        await notifyUser(req.app.get("io"), { userId: expo.organizerId, title: "New exhibitor application", message: `${profile.CompanyName} applied for ${expo.title}.`, type: "application", relatedExpoId: expoId, email: false });
 
         res.status(201).json({ message: "Application created successfully", application });
     } catch (error) {
@@ -61,7 +68,7 @@ const getApplicationById = async (req, res) => {
         if (!existingAppication) {
             return res.status(404).json({ message: "Application not found" })
         }
-        if (req.user.role !== "admin" && existingAppication.exhibitorId.toString() !== req.user.id) {
+        if (req.user.role !== "admin" && existingAppication.exhibitorId._id.toString() !== req.user.id) {
             return res.status(403).json({ message: "You can only view your own application" });
         }
 
@@ -75,7 +82,6 @@ const getApplicationById = async (req, res) => {
 const UpdateApplication = async (req, res) => {
     try {
         const { id } = req.params;
-        const { ApplicationStatus } = req.body;
         const files = req.files?.documents || [];
         const application = await ExhibitorApplication.findById(id);
         if (!application) {
@@ -84,9 +90,9 @@ const UpdateApplication = async (req, res) => {
         if (req.user.role !== "admin" && application.exhibitorId.toString() !== req.user.id) {
             return res.status(403).json({ message: "You can only update your own application" });
         }
+        if (application.ApplicationStatus !== "Applied") return res.status(400).json({ message: "Only pending applications can be updated" });
         const submittedDocuments = application.submittedDocuments;
         const updateFields = {
-            ApplicationStatus,
             updatedAt: Date.now()
         }
 

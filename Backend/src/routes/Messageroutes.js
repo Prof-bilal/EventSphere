@@ -3,6 +3,7 @@ const express = require("express");
 const authMiddleware = require("../middleware/authmiddleware");
 const authorize = require("../middleware/rolemiddleware");
 const router = express.Router();
+router.get("/contacts", authMiddleware, require("../controller/Portalcontroller").getContacts);
 
 router.post("/", authMiddleware, authorize("admin", "exhibitor", "attendee"), MessageController.sendMessage);
 router.get("/conversation/:userId", authMiddleware, authorize("admin", "exhibitor", "attendee"), MessageController.getConversation);

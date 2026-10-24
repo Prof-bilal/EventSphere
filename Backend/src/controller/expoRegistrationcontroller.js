@@ -17,7 +17,7 @@ const registerForExpo = async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
         const isRegistered = await Registration.findOne({ attendeeId, expoId });
-        if (isRegistered) {
+        if (isRegistered?.status === "registered") {
             return res.status(400).json({ message: "User already registered for this expo" });
         }
 
@@ -30,12 +30,12 @@ const registerForExpo = async (req, res) => {
             }
         }
 
-        const registration = await Registration.create({
-            expoId,
-            attendeeId,
-            registrationNumber,
-            status: "registered"
-        });
+        if (expo.status !== "published") return res.status(400).json({ message: "Expo is not open for registration" });
+        if (new Date(expo.registrationDeadline) < new Date()) return res.status(400).json({ message: "Registration deadline has passed" });
+        const count = await Registration.countDocuments({ expoId, status: "registered" });
+        if (count >= expo.capacity) return res.status(400).json({ message: "Expo is full" });
+        const registration = await Registration.findOneAndUpdate({ expoId, attendeeId }, { $set: { status: "registered", registeredAt: Date.now() }, $setOnInsert: { registrationNumber } }, { new: true, upsert: true, runValidators: true });
+        req.app.get("io")?.emit("event:updated", { expoId });
         await notifyUser(req.app.get("io"), {
             userId: attendeeId,
             title: "Expo registration successful",
@@ -94,6 +94,8 @@ const cancelRegistration = async (req, res) => {
         }
         registration.status = "cancelled";
         await registration.save();
+        await require("../model/SessionRegistrationmodel").deleteMany({ attendeeId: req.user.id, expoId: registration.expoId._id });
+        req.app.get("io")?.emit("event:updated", { expoId: registration.expoId._id });
         return res.status(200).json({ message: "Registration cancelled successfully", registration });
     } catch (error) {
         return res.status(500).json({ error: error.message })

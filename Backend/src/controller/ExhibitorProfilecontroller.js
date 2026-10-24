@@ -3,7 +3,7 @@ const Exhibitor = require("../model/exhibitorProfilemodel");
 
 const CreateExhibitor = async (req, res) => {
     try {
-        const { CompanyName, description, products, services, website, contactPerson, phone } = req.body;
+        const { CompanyName, description, products, services, website, contactPerson, phone, category } = req.body;
 
         const userId = req.user.id;
 
@@ -17,7 +17,9 @@ const CreateExhibitor = async (req, res) => {
         const documentUrls = documentFiles.map((file) => `/uploads/exhibitor/${file.filename}`);
 
 
-        const createExhibitor = new Exhibitor({ CompanyName, description, products, services, website, logoUrl, contactPerson, phone, documents: documentUrls, UserId: userId })
+        const existing = await Exhibitor.findOne({ UserId: userId });
+        if (existing) return res.status(400).json({ message: "You already have a company profile" });
+        const createExhibitor = new Exhibitor({ CompanyName, description, products, services, website, category, logoUrl, contactPerson, phone, documents: documentUrls, UserId: userId })
 
         await createExhibitor.save();
         return res.status(201).json({
@@ -54,7 +56,8 @@ const searchExhibitor = async (req, res) => {
             }
             : {};
 
-        const exhibitors = await Exhibitor.find(filter).populate("UserId", "name email");
+        if (req.query.category) filter.category = req.query.category;
+        const exhibitors = await Exhibitor.find(filter).select("-documents").populate("UserId", "name email");
         return res.status(200).json(exhibitors);
     }
     catch (error) {
@@ -79,9 +82,9 @@ const editExhibitor = async (req, res) => {
             return res.status(403).json({ message: "You can only update your own profile" });
         }
 
-        const { CompanyName, description, products, services, website, contactPerson, phone } = req.body;
+        const { CompanyName, description, products, services, website, contactPerson, phone, category } = req.body;
 
-        let updatedata = { CompanyName, description, products, services, website, contactPerson, phone }
+        let updatedata = { CompanyName, description, products, services, website, contactPerson, phone, category }
 
         const logoFile = req.files?.image?.[0];
         const documentFiles = req.files?.documents || [];

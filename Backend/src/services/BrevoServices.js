@@ -54,7 +54,7 @@ const sendEmail = async (to, name , verificationToken) => {
                 Verify Email
               </a>
 
-              <p>This link expires in 30 minutes.</p>
+              <p>This link expires in 24 hours.</p>
 
               <p>
                 If you didn't create this account,

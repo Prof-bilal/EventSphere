@@ -10,6 +10,7 @@ const createBookmark = async (req, res) => {
             return res.status(404).json({ message: "Session not found" });
         }
         const bookmark = await Bookmark.create({ attendeeId, sessionId });
+        req.app.get("io")?.emit("event:updated", { expoId: session.expoId });
         return res.status(201).json({ message: "Session bookmarked successfully", bookmark });
     }
     catch (error) {

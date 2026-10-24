@@ -21,6 +21,8 @@ const path = require("path");
 const http = require("http");
 const jwt = require("jsonwebtoken");
 const { Server } = require("socket.io");
+const User = require("./model/Usermodel");
+const RevokedToken = require("./model/revokesession");
 
 const app = express();
 const server = http.createServer(app);
@@ -31,7 +33,7 @@ const io = new Server(server, {
     }
 });
 
-app.use(cors());
+app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:5176", credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
@@ -50,14 +52,20 @@ app.use("/api/message", messageRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/attendee", attendeeRoutes);
 app.set("io", io);
+app.use((error, req, res, next) => {
+    res.status(error.status || 400).json({ message: error.message });
+});
 
-io.use((socket, next) => {
+io.use(async (socket, next) => {
     try {
         const token = socket.handshake.auth?.token;
         if (!token) {
             return next(new Error("Authentication required"));
         }
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.id);
+        const revoked = await RevokedToken.findOne({ jti: decoded.jti });
+        if (!user || user.IsBlocked || !user.IsActive || revoked) return next(new Error("Please log in again"));
         socket.user = decoded;
         next();
     }
@@ -70,14 +78,17 @@ io.on("connection", (socket) => {
     socket.join(socket.user.id.toString());
 });
 
-connectDB();
-
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 4000;
 
 app.get("/", (req, res) => {
   res.send("Hello World");
 });
 
-server.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+connectDB().then(() => {
+    const { sendReminders } = require("./services/ReminderService");
+    setInterval(() => sendReminders(io), 60 * 1000);
+    server.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
+}).catch(error => {
+    console.error(error.message);
+    process.exitCode = 1;
 });

@@ -3,6 +3,12 @@ const express = require("express");
 const authMiddleware = require("../middleware/authmiddleware");
 const authorize = require("../middleware/rolemiddleware");
 const router = express.Router();
+const SessionRegistration = require("../controller/SessionRegistrationcontroller");
+
+router.get("/my-registrations", authMiddleware, authorize("attendee"), SessionRegistration.getMySessions);
+router.post("/:id/register", authMiddleware, authorize("attendee"), SessionRegistration.registerSession);
+router.delete("/:id/register", authMiddleware, authorize("attendee"), SessionRegistration.cancelSession);
+router.post("/create-session/:expoId", authMiddleware, authorize("admin"), SessionController.CreateSession);
 
 router.post("/create-session/:expoId/:boothId/:exhibitorId", authMiddleware, authorize("exhibitor", "admin"),SessionController.CreateSession);
 router.post("/create-session/:expoId/:boothId", authMiddleware, authorize("exhibitor", "admin"),SessionController.CreateSession);

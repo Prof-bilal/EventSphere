@@ -1,1 +1,0 @@
-export default function Modal({ children, onClose, labelledBy }) { return <div className="modal-backdrop" role="presentation" onMouseDown={event => event.target === event.currentTarget && onClose?.()}><div className="review-modal" role="dialog" aria-modal="true" aria-labelledby={labelledBy}>{children}</div></div> }

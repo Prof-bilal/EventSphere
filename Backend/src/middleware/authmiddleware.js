@@ -3,7 +3,7 @@ const revokedTokenModel = require("../model/revokesession");
 const User = require("../model/Usermodel");
 
 const authMiddleware = async  (req, res, next) => {
-    const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
+    const token = req.headers.authorization?.split(" ")[1] || req.cookies.token;
 
     if (!token) {
         return res.status(401).json({ message: "Please Login First" });

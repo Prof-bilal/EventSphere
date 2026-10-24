@@ -30,6 +30,7 @@ const createExpo = async (req, res) => {
         })
 
         await newExpo.save();
+        req.app.get("io")?.emit("event:updated", { expoId: newExpo._id });
         res.status(201).json(newExpo);
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -117,6 +118,7 @@ const updateExpo = async (req, res) => {
         )
 
         const registrations = await Registration.find({ expoId: id, status: "registered" }).select("attendeeId");
+        req.app.get("io")?.emit("event:updated", { expoId: id });
         await Promise.all(registrations.map((registration) => notifyUser(req.app.get("io"), {
             userId: registration.attendeeId,
             title: "Expo updated",
@@ -159,6 +161,14 @@ const deleteExpo = async (req, res) => {
 
         const registrations = await Registration.find({ expoId: id, status: "registered" }).select("attendeeId");
         await Expo.findByIdAndDelete(id)
+        await require("../model/boothmodel").deleteMany({ expoId: id });
+        const sessions = await require("../model/Sessionmodel").find({ expoId: id }).select("_id");
+        await require("../model/Bookmarkmodel").deleteMany({ sessionId: { $in: sessions.map(item => item._id) } });
+        await require("../model/SessionRegistrationmodel").deleteMany({ expoId: id });
+        await require("../model/Sessionmodel").deleteMany({ expoId: id });
+        await require("../model/exhibitorApplicationmodel").deleteMany({ expoId: id });
+        await Registration.deleteMany({ expoId: id });
+        req.app.get("io")?.emit("event:updated", { expoId: id });
 
         await Promise.all(registrations.map((registration) => notifyUser(req.app.get("io"), {
             userId: registration.attendeeId,

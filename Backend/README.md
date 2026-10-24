@@ -4,7 +4,7 @@ EventSphere is an event management backend built with Node.js, Express, MongoDB,
 
 ## Project status
 
-Current backend status: **functionally complete for the current project requirements**.
+The assignment modules are implemented and connected to the frontend. Run the database and email flows with valid `Backend/.env` settings before recording the demonstration.
 
 Completed modules:
 
@@ -83,7 +83,7 @@ Start the development server:
 npm run dev
 ```
 
-The server runs on the port defined in `.env`. If no port is provided, the application uses port `5000`.
+The server runs on the port defined in `.env`. If no port is provided, the application uses port `4000`. The frontend development proxy expects port `4000`.
 
 Check that the server is running by opening:
 

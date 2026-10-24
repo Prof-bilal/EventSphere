@@ -62,7 +62,7 @@ The API normally runs at http://localhost:4000. For routes and Postman examples,
 
 ## Backend status
 
-The backend is functionally complete for the current project requirements. It includes:
+The assignment modules are implemented in the backend and connected to the frontend. Database and email flows require valid local environment settings. The modules include:
 
 - JWT authentication, email verification, password reset, and logout
 - Admin, exhibitor, and attendee roles
@@ -124,10 +124,10 @@ Notifications are stored in MongoDB and important notifications are sent through
 
 ## 3. Set up the frontend
 
-Open a second terminal from the project root:
+Open a second terminal and run the frontend from the repository:
 
 ~~~bash
-cd frontend
+cd /home/abullah/Projects/EventSphere/frontend
 npm install
 npm run dev
 ~~~
@@ -141,7 +141,20 @@ npm run build
 npm run preview
 ~~~
 
-For available pages and current frontend limitations, read [frontend/README.md](frontend/README.md).
+The Vite development server forwards `/api`, `/uploads`, and `/socket.io` to the backend on port 4000. Keep `PORT=4000` in `Backend/.env` and set `FRONTEND_URL` to the URL printed by Vite so email links return to the correct frontend.
+
+For the page structure, read [frontend/README.md](frontend/README.md). For a walkthrough of the implementation, read [frontend/CHANGES.md](frontend/CHANGES.md).
+
+## Create the first organizer account
+
+Add `ADMIN_NAME`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD` to `Backend/.env`. Then run:
+
+```bash
+cd Backend
+npm run create-admin
+```
+
+The script creates a verified organizer account and leaves existing accounts untouched. Public registration creates only attendee and exhibitor accounts. Exhibitors verify their email and wait for organizer approval from the User management page before signing in.
 
 ## Beginner Git workflow
 

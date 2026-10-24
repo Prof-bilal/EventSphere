@@ -10,6 +10,7 @@ const createNotification = async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
         const notification = await notifyUser(req.app.get("io"), { userId, title, message, type, relatedExpoId });
+        if (!notification) return res.status(400).json({ message: "Could not create notification. Check the required fields." });
         return res.status(201).json({ message: "Notification created successfully", notification });
     }
     catch (error) {

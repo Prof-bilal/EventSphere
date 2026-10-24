@@ -13,8 +13,12 @@ const createBooth = async (req, res) => {
         if (!expo) {
             return res.status(404).json({ message: "Expo not found" });
         }
-        const boothCount = await Booth.countDocuments({ expoId });
-        const boothNumber = `${expo.title}-${boothCount + 1}`;
+        let boothCount = await Booth.countDocuments({ expoId });
+        let boothNumber = `${expo.title}-${boothCount + 1}`;
+        while (await Booth.exists({ boothNumber })) {
+            boothCount++;
+            boothNumber = `${expo.title}-${boothCount + 1}`;
+        }
 
 
         const booth = await Booth.create({
@@ -26,6 +30,7 @@ const createBooth = async (req, res) => {
             size,
             price
         });
+        req.app.get("io")?.emit("event:updated", { expoId });
         return res.status(201).json({ message: "Booth created successfully", booth });
 
     }
@@ -52,9 +57,11 @@ const assignBooth = async (req, res) => {
         if (!exhibitor) {
             return res.status(404).json({ message: "Exhibitor not found" });
         }
-        booth.exhibitorId = exhibitorId;
-        booth.status = "booked";
-        await booth.save();
+        const application = await require("../model/exhibitorApplicationmodel").findOne({ expoId: booth.expoId, exhibitorId, ApplicationStatus: "Approved" });
+        if (!application) return res.status(400).json({ message: "Exhibitor application must be approved" });
+        const assigned = await Booth.findOneAndUpdate({ _id: id, exhibitorId: null, status: "available" }, { exhibitorId, status: "booked", requestedBy: [], updatedAt: Date.now() }, { new: true });
+        if (!assigned) return res.status(400).json({ message: "Booth is already booked" });
+        req.app.get("io")?.emit("event:updated", { expoId: booth.expoId });
         await notifyUser(req.app.get("io"), {
             userId: exhibitorId,
             title: "Booth assigned",
@@ -62,7 +69,7 @@ const assignBooth = async (req, res) => {
             type: "booth",
             relatedExpoId: booth.expoId
         });
-        return res.status(200).json({ message: "Booth assigned successfully", booth });
+        return res.status(200).json({ message: "Booth assigned successfully", booth: assigned });
     }
     catch (error) {
         return res.status(500).json({ error: error.message })
@@ -71,7 +78,11 @@ const assignBooth = async (req, res) => {
 
 const getBooths = async (req,res) => {
     try {
-        const booths = await Booth.find().populate("exhibitorId", "name").populate("expoId", "title");
+        const filter = req.query.expoId ? { expoId: req.query.expoId } : {};
+        let query = Booth.find(filter).populate("exhibitorId", "name email").populate("expoId", "title");
+        if (req.user?.role === "admin") query = query.populate("requestedBy", "name email");
+        else query = query.select("-requestedBy");
+        const booths = await query;
         return res.status(200).json(booths);
     }
     catch (error) {
@@ -131,6 +142,7 @@ const EditBooth = async (req , res) => {
 
         
         const updatedBooth = await Booth.findByIdAndUpdate(id, { boothType , floorName , position , size , price , status, updatedAt: Date.now() } , { returnDocument : "after" , runValidators:true});
+        req.app.get("io")?.emit("event:updated", { expoId: booth.expoId });
         return res.status(200).json({ message: "Booth Updated successfully", booth:updatedBooth });
     }
     catch (error) {
@@ -165,6 +177,7 @@ const DeleteBooth = async (req , res) => {
         }
         
         await Booth.findByIdAndDelete(id);
+        req.app.get("io")?.emit("event:updated", { expoId: booth.expoId });
         return res.status(200).json({ message: "Booth deleted successfully" });
     }
     catch (error) {

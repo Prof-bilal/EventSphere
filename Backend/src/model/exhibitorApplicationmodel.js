@@ -43,5 +43,7 @@ const ExhibitorApplicationSchema = new mongoose.Schema({
     }
 })
 
+ExhibitorApplicationSchema.index({ expoId: 1, exhibitorId: 1 }, { unique: true });
+
 const ExhibitorApplication = mongoose.model("ExhibitorApplication", ExhibitorApplicationSchema)
 module.exports = ExhibitorApplication
