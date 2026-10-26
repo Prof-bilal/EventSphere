@@ -1,0 +1,127 @@
+.expo-record {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.expo-record .record-image {
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: 260px;
+  margin: -24px -24px 20px;
+  width: calc(100% + 48px);
+  border-radius: 5px 5px 0 0;
+  object-position: center;
+  background: #171719;
+}
+
+.expo-record .status-pill {
+  align-self: flex-start;
+  padding: 6px 10px;
+  color: #a34f35;
+  background: #fff0e9;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: capitalize;
+}
+
+.expo-record h2 {
+  margin-top: 12px;
+  color: #352d30;
+  font-size: 23px;
+  letter-spacing: -.03em;
+}
+
+.expo-record > p {
+  color: #897a71;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.expo-record > p:last-of-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 15px;
+  color: #a15c45;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.expo-record .record-actions {
+  justify-content: flex-end;
+  margin: 20px 0 0;
+  padding-top: 17px;
+  border-top: 1px solid #eee5dc;
+}
+
+.expo-record .record-actions .text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 4px;
+  color: #4b3e40;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.expo-record .record-actions .text-link::after {
+  color: #ca5d3e;
+  content: '↗';
+  font-size: 14px;
+}
+
+.expo-record .record-actions .text-link:hover {
+  color: #c65335;
+}
+
+.expo-record .record-actions .dash-primary,
+.expo-record .record-actions .outline-button,
+.expo-record .record-actions .danger-button {
+  min-height: 40px;
+  padding: 0 15px;
+  border-radius: 6px;
+  font-size: 10px;
+}
+
+.expo-record .record-actions .dash-primary:disabled {
+  border: 1px solid #e8ab96;
+  color: #fffaf5;
+  background: #eca087;
+  cursor: default;
+  opacity: 1;
+}
+
+.expo-record .record-actions .outline-button {
+  color: #9b5841;
+  border-color: #dfc7b8;
+  background: #fffaf6;
+}
+
+.expo-record .record-actions .outline-button:hover:not(:disabled) {
+  border-color: #c98a70;
+  background: #fff0e9;
+}
+
+@media (max-width: 560px) {
+  .expo-record .record-image {
+    height: 205px;
+    margin-right: -20px;
+    margin-left: -20px;
+    width: calc(100% + 40px);
+  }
+
+  .expo-record .record-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .expo-record .record-actions > * {
+    justify-content: center;
+    width: 100%;
+  }
+}

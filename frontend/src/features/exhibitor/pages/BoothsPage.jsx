@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Building2, DollarSign, MapPin, Package, Save, UserRound } from 'lucide-react'
 import { api } from '../../../api'
 import { useAuth } from '../../../state/AuthContext'
 
@@ -124,57 +125,37 @@ export default function BoothsPage() {
           </div>
         </section>
         {selected && (
-          <aside className="dash-card booth-detail">
-            <h2>{selected.boothNumber}</h2>
-            <span className="status-pill">{selected.status}</span>
-            <p>
-              {selected.expoId?.title} · {selected.floorName}
-            </p>
-            <p>
-              {selected.size.width} × {selected.size.height} · Position {selected.position.x},{' '}
-              {selected.position.y}
-            </p>
-            <p>
-              {selected.boothType} · {selected.price}
-            </p>
-            {selected.exhibitorId && <p>Exhibitor: {selected.exhibitorId.name}</p>}
-            <p>Products: {selected.products || 'Not added'}</p>
-            <p>Services: {selected.services || 'Not added'}</p>
-            <p>Staff: {selected.staff || 'Not added'}</p>
+          <aside className="dash-card booth-detail booth-detail-redesigned exhibitor-booth-detail">
+            <div className="booth-detail-header"><div><span className="dash-eyebrow">YOUR BOOTH</span><h2>{selected.boothNumber}</h2></div><span className={`booth-status booth-status-${selected.status}`}>{selected.status}</span></div>
+            <div className="booth-detail-context"><span><Building2 size={14} /> {selected.expoId?.title || 'Selected expo'}</span><span><MapPin size={14} /> {selected.floorName}</span></div>
+            <div className="booth-detail-stats"><div><Package size={15} /><span>Type<strong>{selected.boothType}</strong></span></div><div><MapPin size={15} /><span>Position<strong>{selected.position.x}, {selected.position.y}</strong></span></div><div><DollarSign size={15} /><span>Price<strong>{selected.price}</strong></span></div></div>
+            <div className="booth-detail-info"><div><Package size={15} /><span>Size<strong>{selected.size.width} × {selected.size.height}</strong></span></div><div><UserRound size={15} /><span>Exhibitor<strong>{selected.exhibitorId?.name || 'Not assigned'}</strong></span></div></div>
             {selected.exhibitorId?._id === user._id ? (
-              <form onSubmit={saveDetails}>
+              <form className="exhibitor-booth-form" onSubmit={saveDetails}>
+                <div className="exhibitor-form-heading"><span className="dash-eyebrow">BOOTH PROFILE</span><h3>Tell visitors what to expect</h3></div>
                 <label className="workspace-field">
                   <span>Products</span>
-                  <input
-                    value={details.products}
+                  <input placeholder="What are you showcasing?" value={details.products}
                     onChange={(event) => setDetails({ ...details, products: event.target.value })}
                   />
                 </label>
                 <label className="workspace-field">
                   <span>Services</span>
-                  <input
-                    value={details.services}
+                  <input placeholder="What services do you offer?" value={details.services}
                     onChange={(event) => setDetails({ ...details, services: event.target.value })}
                   />
                 </label>
                 <label className="workspace-field">
                   <span>Staff names</span>
-                  <input
-                    value={details.staff}
+                  <input placeholder="Who will be at the booth?" value={details.staff}
                     onChange={(event) => setDetails({ ...details, staff: event.target.value })}
                   />
                 </label>
-                <button className="dash-primary" disabled={busy}>
-                  Save booth details
-                </button>
+                <div className="exhibitor-booth-form-footer"><p>Keep these details updated for attendees.</p><button className="dash-primary" disabled={busy}><Save size={15} /> Save details</button></div>
               </form>
             ) : (
-              <button
-                className="dash-primary"
-                disabled={busy || selected.status !== 'available'}
-                onClick={request}
-              >
-                Request booth
+              <button className="dash-primary booth-assign-button" disabled={busy || selected.status !== 'available'} onClick={request}>
+                <Package size={15} /> Request booth
               </button>
             )}
           </aside>

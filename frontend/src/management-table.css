@@ -1,0 +1,196 @@
+.management-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #e8ded4;
+  border-radius: 10px;
+  background: #fffdf9;
+  box-shadow: 0 8px 24px rgba(44, 31, 22, .035);
+}
+
+.management-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.management-table th {
+  padding: 14px 18px;
+  border-bottom: 1px solid #e9dfd5;
+  color: #9a897f;
+  background: #fbf5ef;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.management-table td {
+  padding: 16px 18px;
+  border-bottom: 1px solid #f0e8e0;
+  color: #766860;
+  font-size: 11px;
+  vertical-align: middle;
+}
+
+.management-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.management-table tbody tr:hover {
+  background: #fffaf5;
+}
+
+.management-event {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 240px;
+}
+
+.management-event-thumb {
+  display: grid;
+  width: 43px;
+  height: 43px;
+  flex: 0 0 43px;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 8px;
+  color: #a54f35;
+  background: #f8dfd4;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.management-event-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.management-event > div,
+.management-meta {
+  display: grid;
+  gap: 5px;
+}
+
+.management-event strong,
+.management-meta strong {
+  color: #3e3538;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.management-event small,
+.management-meta small {
+  display: block;
+  max-width: 260px;
+  overflow: hidden;
+  color: #9a8b82;
+  font-size: 10px;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.management-status {
+  display: inline-flex;
+  padding: 6px 9px;
+  border-radius: 999px;
+  color: #9a5a3f;
+  background: #faeadf;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.management-status-published,
+.management-status-approved,
+.management-status-open {
+  color: #4d775a;
+  background: #e8f2e8;
+}
+
+.management-status-pending {
+  color: #9a7337;
+  background: #fff1d7;
+}
+
+.management-status-rejected,
+.management-status-cancelled {
+  color: #a64d3a;
+  background: #fbe7e2;
+}
+
+.management-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+.management-link {
+  margin-right: 4px;
+  color: #4c3e40;
+  font-size: 10px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.management-link:hover {
+  color: #c65335;
+}
+
+.management-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 11px;
+  border: 1px solid #dfcfc3;
+  border-radius: 6px;
+  color: #94604e;
+  background: #fffaf6;
+  cursor: pointer;
+  font: 600 10px Manrope;
+  text-decoration: none;
+}
+
+.management-button:hover:not(:disabled) {
+  border-color: #c98a70;
+  background: #fff0e9;
+}
+
+.management-button:disabled {
+  cursor: default;
+  opacity: .65;
+}
+
+.management-button-primary {
+  border-color: #dc633f;
+  color: #fffaf5;
+  background: #dc633f;
+}
+
+.management-button-primary:hover {
+  border-color: #c95031;
+  color: #fffaf5;
+  background: #c95031;
+}
+
+.management-button-danger {
+  border-color: #e4c7bd;
+  color: #a64d3a;
+  background: #fff8f5;
+}
+
+.management-button-danger:hover:not(:disabled) {
+  border-color: #d99a87;
+  background: #fbe7e2;
+}
+
+@media (max-width: 760px) {
+  .management-table {
+    min-width: 700px;
+  }
+}

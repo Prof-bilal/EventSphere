@@ -74,33 +74,20 @@ export default function ExposPage() {
       )}
       {loading && <p role="status">Loading expos...</p>}
       {!loading && !filtered.length && <p className="empty-state">No expos found.</p>}
-      <div className="dash-grid">
-        {filtered.map((expo) => (
-          <article className="dash-card" key={expo._id}>
-            {expo.imageUrl && <img className="record-image" src={expo.imageUrl} alt={expo.title} />}
-            <span className="status-pill">{expo.status}</span>
-            <h2>{expo.title}</h2>
-            <p>{expo.description}</p>
-            <p>
-              {expo.location} · {new Date(expo.startDate).toLocaleDateString()}
-            </p>
-            <div className="record-actions">
-              <Link className="text-link" to={'/events/' + expo._id}>
-                View event
-              </Link>
-              <Link className="outline-button" to={'/dashboard/expos/' + expo._id + '/edit'}>
-                Edit
-              </Link>
-              <button
-                className="danger-button"
-                disabled={busy}
-                onClick={() => deleteExpo(expo._id)}
-              >
-                Delete
-              </button>
-            </div>
-          </article>
-        ))}
+      <div className="management-table-wrap">
+        <table className="management-table">
+          <thead><tr><th>Expo</th><th>Location & date</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            {filtered.map((expo) => (
+              <tr key={expo._id}>
+                <td><div className="management-event"><span className="management-event-thumb">{expo.imageUrl ? <img src={expo.imageUrl} alt="" /> : expo.title.slice(0, 1)}</span><div><strong>{expo.title}</strong><small>{expo.description || 'No description added.'}</small></div></div></td>
+                <td><div className="management-meta"><strong>{expo.location}</strong><small>{new Date(expo.startDate).toLocaleDateString()} – {new Date(expo.endDate).toLocaleDateString()}</small></div></td>
+                <td><span className={`management-status management-status-${expo.status}`}>{expo.status}</span></td>
+                <td><div className="management-actions"><Link className="management-link" to={'/events/' + expo._id}>View event ↗</Link><Link className="management-button" to={'/dashboard/expos/' + expo._id + '/edit'}>Edit</Link><button className="management-button management-button-danger" disabled={busy} onClick={() => deleteExpo(expo._id)}>Delete</button></div></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   )

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { ArrowUpRight, MapPin } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { api } from '../../../api'
 import { PublicLayout } from '../components/PublicComponents'
@@ -56,11 +57,19 @@ export default function EventsPage() {
                 <span>{expo.status}</span>
               </div>
               <div className="event-card-body">
-                <span className="eyebrow">{new Date(expo.startDate).toLocaleDateString()}</span>
+                <time className="event-card-date" dateTime={expo.startDate}>
+                  {new Date(expo.startDate).toLocaleDateString(undefined, {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })}
+                </time>
                 <h2>{expo.title}</h2>
-                <p>{expo.location}</p>
-                <p>{expo.description}</p>
-                <div>Explore event →</div>
+                <p className="event-card-location"><MapPin size={14} /> {expo.location}</p>
+                <p className="event-card-description">
+                  {expo.description || 'Discover the people, ideas, and experiences shaping what comes next.'}
+                </p>
+                <div className="event-card-action"><span>Explore event</span><ArrowUpRight size={16} /></div>
               </div>
             </Link>
           ))}

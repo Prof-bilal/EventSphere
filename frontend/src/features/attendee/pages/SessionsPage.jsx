@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Bookmark, CalendarDays, Clock3, MapPin } from 'lucide-react'
 import { api } from '../../../api'
 
 export default function SessionsPage() {
@@ -76,33 +77,12 @@ export default function SessionsPage() {
       )}
       {loading && <p>Loading sessions...</p>}
       {!loading && !filtered.length && <p className="empty-state">No sessions found.</p>}
-      <section className="dash-card">
+      <section className="session-records">
         {filtered.map((item) => (
-          <article className="activity-row" key={item._id}>
-            <div>
-              <span className="dash-eyebrow">
-                {item.sessionType} · {item.expoId?.title}
-              </span>
-              <h3>{item.title}</h3>
-              <p>
-                {item.speakerName} · {item.location}
-              </p>
-              <small>
-                {new Date(item.startDate).toLocaleDateString()} · {item.startTime}–{item.endTime}
-              </small>
-            </div>
-            <div className="record-actions">
-              <button className="outline-button" disabled={busy} onClick={() => bookmark(item._id)}>
-                {bookmarks.some((saved) => saved.sessionId?._id === item._id)
-                  ? 'Remove bookmark'
-                  : 'Bookmark'}
-              </button>
-              <button className="dash-primary" disabled={busy} onClick={() => register(item._id)}>
-                {registered.some((saved) => saved.sessionId?._id === item._id)
-                  ? 'Cancel registration'
-                  : 'Register'}
-              </button>
-            </div>
+          <article className="session-record" key={item._id}>
+            <div className="session-record-date"><CalendarDays size={16} /><strong>{new Date(item.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</strong><small>{item.startTime}</small></div>
+            <div className="session-record-main"><span className="session-record-type">{item.sessionType} · {item.expoId?.title || 'Expo'}</span><h3>{item.title}</h3><p>{item.speakerName} · {item.location}</p><span className="session-record-time"><Clock3 size={13} /> {item.startTime}–{item.endTime} <MapPin size={13} /> {item.location}</span></div>
+            <div className="session-record-actions"><button className="session-action-edit" disabled={busy} onClick={() => bookmark(item._id)}><Bookmark size={14} />{bookmarks.some((saved) => saved.sessionId?._id === item._id) ? 'Saved' : 'Save'}</button><button className="session-action-register" disabled={busy} onClick={() => register(item._id)}>{registered.some((saved) => saved.sessionId?._id === item._id) ? 'Registered' : 'Register'}</button></div>
           </article>
         ))}
       </section>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { CalendarDays, Clock3, MapPin } from 'lucide-react'
 import { api } from '../../../api'
 
 export default function SessionsPage() {
@@ -50,22 +51,11 @@ export default function SessionsPage() {
       )}
       {loading && <p>Loading sessions...</p>}
       {!loading && !filtered.length && <p className="empty-state">No sessions found.</p>}
-      <section className="dash-card">
+      <section className="session-records">
         {filtered.map((item) => (
-          <article className="activity-row" key={item._id}>
-            <div>
-              <span className="dash-eyebrow">
-                {item.sessionType} · {item.expoId?.title}
-              </span>
-              <h3>{item.title}</h3>
-              <p>
-                {item.speakerName} · {item.location}
-              </p>
-              <small>
-                {new Date(item.startDate).toLocaleDateString()} · {item.startTime}–{item.endTime}
-              </small>
-            </div>
-            <div className="record-actions"></div>
+          <article className="session-record session-record-readonly" key={item._id}>
+            <div className="session-record-date"><CalendarDays size={16} /><strong>{new Date(item.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</strong><small>{item.startTime}</small></div>
+            <div className="session-record-main"><span className="session-record-type">{item.sessionType} · {item.expoId?.title || 'Expo'}</span><h3>{item.title}</h3><p>{item.speakerName} · {item.location}</p><span className="session-record-time"><Clock3 size={13} /> {item.startTime}–{item.endTime} <MapPin size={13} /> {item.location}</span></div>
           </article>
         ))}
       </section>

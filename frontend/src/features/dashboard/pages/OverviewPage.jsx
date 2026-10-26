@@ -29,7 +29,7 @@ export default function OverviewPage() {
   }, [])
 
   return (
-    <div className="dash-view">
+    <div className="dash-view overview-page">
       <div className="page-intro">
         <div>
           <span className="dash-eyebrow">{config.workspaceLabel}</span>
@@ -39,26 +39,26 @@ export default function OverviewPage() {
       </div>
       {error && <p className="api-error" role="alert">{error}</p>}
       {loading && <p>Loading overview...</p>}
-      <div className="dash-grid">
-        <article className="dash-card">
+      <div className="overview-grid">
+        <article className="overview-stat dash-card">
           <span className="dash-eyebrow">EXPOS</span>
           <h2>{expos.length}</h2>
           <Link className="text-link" to="/dashboard/expos">Explore expos</Link>
         </article>
-        <article className="dash-card">
+        <article className="overview-stat dash-card">
           <span className="dash-eyebrow">SESSIONS</span>
           <h2>{sessions.length}</h2>
           <Link className="text-link" to="/dashboard/sessions">View schedule</Link>
         </article>
-        <article className="dash-card">
+        <article className="overview-next dash-card">
           <span className="dash-eyebrow">YOUR NEXT STEP</span>
           <h2>{config.overview.nextStepTitle}</h2>
           <Link className="dash-primary" to={config.overview.nextStepPath}>{config.overview.nextStepLabel}</Link>
         </article>
       </div>
-      <section className="dash-card">
+      <section className="overview-sessions dash-card">
         <h2>Upcoming sessions</h2>
-        {!sessions.length && <p>No sessions yet.</p>}
+        {!sessions.length && <p className="overview-empty">No sessions scheduled yet. Your event schedule will appear here.</p>}
         {sessions.slice(0, 5).map((session) => (
           <article className="activity-row" key={session._id}>
             <div>

@@ -1,0 +1,154 @@
+.application-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #e8ded4;
+  border-radius: 10px;
+  background: #fffdf9;
+  box-shadow: 0 8px 24px rgba(44, 31, 22, .035);
+}
+
+.application-table {
+  width: 100%;
+  min-width: 920px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.application-table th {
+  padding: 14px 17px;
+  border-bottom: 1px solid #e9dfd5;
+  color: #9a897f;
+  background: #fbf5ef;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.application-table td {
+  padding: 15px 17px;
+  border-bottom: 1px solid #f0e8e0;
+  color: #766860;
+  font-size: 11px;
+  vertical-align: middle;
+}
+
+.application-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.application-table tbody tr:hover {
+  background: #fffaf5;
+}
+
+.application-table-expo {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 170px;
+}
+
+.application-table-expo > div {
+  display: grid;
+  gap: 5px;
+}
+
+.application-table-expo strong {
+  color: #3b3235;
+  font-size: 12px;
+}
+
+.application-table-expo small {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 190px;
+  overflow: hidden;
+  color: #a08f84;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.application-table-person {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 110px;
+  color: #5d4e4e;
+}
+
+.application-table-person svg {
+  color: #c56c4f;
+}
+
+.application-table-documents {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-width: 145px;
+}
+
+.application-table-documents a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 7px;
+  border: 1px solid #ecd9cd;
+  border-radius: 5px;
+  color: #a5543b;
+  background: #fff8f3;
+  font-size: 9px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.application-table-documents a:hover {
+  background: #fff0e9;
+}
+
+.application-table-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 145px;
+}
+
+.application-table-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 32px;
+  padding: 0 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  font: 600 9px Manrope;
+}
+
+.application-table-actions button:disabled {
+  cursor: wait;
+  opacity: .55;
+}
+
+.application-table .application-review-approve {
+  border: 1px solid #bcd7bf;
+  color: #4e7457;
+  background: #edf7ee;
+}
+
+.application-table .application-review-reject {
+  border: 1px solid #e5c4bb;
+  color: #a44d3b;
+  background: #fff7f4;
+}
+
+.application-reviewed {
+  color: #a3948b;
+  font-size: 10px;
+}
+
+@media (max-width: 760px) {
+  .application-table {
+    min-width: 850px;
+  }
+}

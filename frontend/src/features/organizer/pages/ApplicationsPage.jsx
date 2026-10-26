@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Check, FileText, MessageSquareText, UserRound } from 'lucide-react'
 import { api } from '../../../api'
 
 export default function ApplicationsPage() {
@@ -59,39 +60,7 @@ export default function ApplicationsPage() {
       </label>
       {loading && <p>Loading applications...</p>}
       {!loading && !applications.length && <p className="empty-state">No applications yet.</p>}
-      {applications.map((item) => (
-        <article className="dash-card" key={item._id}>
-          <span className="status-pill">{item.ApplicationStatus}</span>
-          <h3>{item.expoId?.title || 'Deleted expo'}</h3>
-          <p>{item.exhibitorId?.name}</p>
-          <p>{item.remarks}</p>
-          <div className="record-actions">
-            {item.submittedDocuments.map((path, index) => (
-              <a className="text-link" key={path} href={path} target="_blank" rel="noreferrer">
-                Document {index + 1}
-              </a>
-            ))}
-          </div>
-          {item.ApplicationStatus === 'Applied' && (
-            <div className="record-actions">
-              <button
-                className="dash-primary"
-                disabled={busy}
-                onClick={() => review(item._id, true)}
-              >
-                Approve
-              </button>
-              <button
-                className="danger-button"
-                disabled={busy}
-                onClick={() => review(item._id, false)}
-              >
-                Reject
-              </button>
-            </div>
-          )}
-        </article>
-      ))}
+      {!!applications.length && <div className="application-table-wrap"><table className="application-table"><thead><tr><th>Expo</th><th>Exhibitor</th><th>Documents</th><th>Status</th><th>Review</th></tr></thead><tbody>{applications.map((item) => <tr key={item._id}><td><div className="application-table-expo"><span className="application-mark"><FileText size={16} /></span><div><strong>{item.expoId?.title || 'Deleted expo'}</strong>{item.remarks && <small><MessageSquareText size={12} /> {item.remarks}</small>}</div></div></td><td><span className="application-table-person"><UserRound size={14} /> {item.exhibitorId?.name || 'Unknown exhibitor'}</span></td><td><div className="application-table-documents">{(item.submittedDocuments || []).map((path, index) => <a key={path} href={path} target="_blank" rel="noreferrer"><FileText size={13} /> Document {index + 1}</a>)}</div></td><td><span className={`application-status application-status-${item.ApplicationStatus?.toLowerCase().replace(/\s+/g, '-')}`}>{item.ApplicationStatus}</span></td><td>{item.ApplicationStatus === 'Applied' ? <div className="application-table-actions"><button className="application-review-approve" disabled={busy} onClick={() => review(item._id, true)}><Check size={14} /> Approve</button><button className="application-review-reject" disabled={busy} onClick={() => review(item._id, false)}>Reject</button></div> : <span className="application-reviewed">Reviewed</span>}</td></tr>)}</tbody></table></div>}
     </div>
   )
 }

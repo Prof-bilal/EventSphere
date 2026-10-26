@@ -1,0 +1,243 @@
+.session-form {
+  padding: 25px 27px;
+}
+
+.session-form-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 24px;
+  padding-bottom: 17px;
+  border-bottom: 1px solid #eee5dc;
+}
+
+.session-form-heading .dash-eyebrow {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.session-form-heading h2 {
+  margin: 0;
+  color: #3b3235;
+  font-size: 22px;
+}
+
+.session-form-heading > span {
+  padding-top: 3px;
+  color: #9b8a80;
+  font-size: 10px;
+}
+
+.session-form .workspace-field input,
+.session-form .workspace-field select,
+.session-form .workspace-field textarea {
+  border-radius: 7px;
+}
+
+.session-date-hint {
+  color: #a05d45;
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+.session-form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 24px;
+  padding-top: 19px;
+  border-top: 1px solid #eee5dc;
+}
+
+.session-form-footer p {
+  margin: 0;
+  color: #9a897f;
+  font-size: 10px;
+}
+
+.session-form-footer .dash-primary {
+  min-width: 125px;
+  justify-content: center;
+  margin: 0;
+}
+
+.session-records {
+  display: grid;
+  gap: 11px;
+}
+
+.session-record {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 20px;
+  border: 1px solid #e8ded4;
+  border-radius: 10px;
+  background: #fffdf9;
+  box-shadow: 0 8px 24px rgba(44, 31, 22, .03);
+}
+
+.session-record-date {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding-right: 18px;
+  border-right: 1px solid #eee5dc;
+  color: #c46345;
+}
+
+.session-record-date strong {
+  font-size: 14px;
+}
+
+.session-record-date small {
+  color: #a18f84;
+  font-size: 10px;
+}
+
+.session-record-main {
+  min-width: 0;
+}
+
+.session-record-type {
+  color: #a15c45;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+.session-record h3 {
+  margin: 6px 0 5px;
+  color: #3b3235;
+  font-size: 18px;
+}
+
+.session-record-main > p {
+  margin: 0;
+  color: #81736b;
+  font-size: 11px;
+}
+
+.session-record-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 10px;
+  color: #a08f84;
+  font-size: 10px;
+}
+
+.session-record-time svg:last-of-type {
+  margin-left: 7px;
+}
+
+.session-record-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.session-action-edit,
+.session-action-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 35px;
+  padding: 0 11px;
+  border-radius: 6px;
+  font: 600 10px Manrope;
+  text-decoration: none;
+}
+
+.session-action-edit {
+  border: 1px solid #dfcfc3;
+  color: #94604e;
+  background: #fffaf6;
+}
+
+.session-action-delete {
+  border: 1px solid #e5c6bc;
+  color: #a44d3b;
+  background: #fff7f4;
+  cursor: pointer;
+}
+
+.session-action-edit:hover {
+  background: #fff0e9;
+}
+
+.session-action-delete:hover:not(:disabled) {
+  background: #fbe7e2;
+}
+
+.session-action-delete:disabled {
+  cursor: wait;
+  opacity: .55;
+}
+
+.session-action-register {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 35px;
+  padding: 0 12px;
+  border: 1px solid #dc633f;
+  border-radius: 6px;
+  color: #fffaf5;
+  background: #dc633f;
+  cursor: pointer;
+  font: 700 10px Manrope;
+}
+
+.session-action-register:hover:not(:disabled) {
+  border-color: #c95031;
+  background: #c95031;
+}
+
+.session-action-register:disabled {
+  cursor: default;
+  opacity: .65;
+}
+
+.session-record-readonly {
+  grid-template-columns: 82px minmax(0, 1fr);
+}
+
+@media (max-width: 700px) {
+  .session-form-heading,
+  .session-form-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .session-form-footer .dash-primary {
+    width: 100%;
+  }
+
+  .session-record {
+    grid-template-columns: 1fr;
+    gap: 13px;
+  }
+
+  .session-record-readonly {
+    grid-template-columns: 1fr;
+  }
+
+  .session-record-date {
+    display: flex;
+    justify-content: flex-start;
+    gap: 7px;
+    padding: 0 0 10px;
+    border-right: 0;
+    border-bottom: 1px solid #eee5dc;
+  }
+
+  .session-record-actions > * {
+    flex: 1;
+  }
+}

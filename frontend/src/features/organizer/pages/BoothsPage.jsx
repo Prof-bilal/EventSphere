@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Building2, DollarSign, Edit3, MapPin, Package, Ruler, Save, Trash2, UserCheck, Users, X } from 'lucide-react'
 import { api } from '../../../api'
 
 export default function BoothsPage() {
@@ -157,8 +158,8 @@ export default function BoothsPage() {
           ))}
         </select>
       </label>
-      <form className="workspace-form" onSubmit={saveBooth}>
-        <h2>{editing ? 'Edit booth' : 'Create booth'}</h2>
+      <form className="workspace-form booth-form" onSubmit={saveBooth}>
+        <div className="booth-form-heading"><div><span className="dash-eyebrow">BOOTH SETUP</span><h2>{editing ? 'Edit booth' : 'Create booth'}</h2></div><span>{editing ? 'Update booth details' : 'Add a new space to the floor plan'}</span></div>
         <div className="form-grid">
           <label className="workspace-field">
             <span>Type</span>
@@ -229,15 +230,10 @@ export default function BoothsPage() {
             />
           </label>
         </div>
-        <button className="dash-primary" disabled={busy || !expoId}>
-          {busy ? 'Saving...' : 'Save booth'}
-        </button>
-        {!expoId && <p>Select an expo before creating a booth.</p>}
-        {editing && (
-          <button type="button" className="outline-button" onClick={() => setEditing('')}>
-            Cancel edit
-          </button>
-        )}
+        <div className="booth-form-footer">
+          {!expoId && <p>Select an expo before creating a booth.</p>}
+          <div className="booth-form-actions"><button className="dash-primary" disabled={busy || !expoId}><Save size={15} />{busy ? 'Saving...' : 'Save booth'}</button>{editing && <button type="button" className="outline-button" onClick={() => setEditing('')}><X size={14} /> Cancel edit</button>}</div>
+        </div>
       </form>
       {loading && <p>Loading floor plan...</p>}
       {!loading && !filtered.length && <p className="empty-state">No booths found.</p>}
@@ -257,36 +253,23 @@ export default function BoothsPage() {
           </div>
         </section>
         {selected && (
-          <aside className="dash-card booth-detail">
-            <h2>{selected.boothNumber}</h2>
-            <span className="status-pill">{selected.status}</span>
-            <p>
-              {selected.expoId?.title} · {selected.floorName}
-            </p>
-            <p>
-              {selected.size.width} × {selected.size.height} · Position {selected.position.x},{' '}
-              {selected.position.y}
-            </p>
-            <p>
-              {selected.boothType} · {selected.price}
-            </p>
-            {selected.exhibitorId && <p>Exhibitor: {selected.exhibitorId.name}</p>}
-            <p>Products: {selected.products || 'Not added'}</p>
-            <p>Services: {selected.services || 'Not added'}</p>
-            <p>Staff: {selected.staff || 'Not added'}</p>
+          <aside className="dash-card booth-detail booth-detail-redesigned">
+            <div className="booth-detail-header"><div><span className="dash-eyebrow">BOOTH DETAILS</span><h2>{selected.boothNumber}</h2></div><span className={`booth-status booth-status-${selected.status}`}>{selected.status}</span></div>
+            <div className="booth-detail-context"><span><Building2 size={14} /> {selected.expoId?.title || 'Selected expo'}</span><span><MapPin size={14} /> {selected.floorName}</span></div>
+            <div className="booth-detail-stats"><div><Ruler size={15} /><span>Size<strong>{selected.size.width} × {selected.size.height}</strong></span></div><div><MapPin size={15} /><span>Position<strong>{selected.position.x}, {selected.position.y}</strong></span></div><div><DollarSign size={15} /><span>Price<strong>{selected.boothType} · {selected.price}</strong></span></div></div>
+            <div className="booth-detail-info"><div><Package size={15} /><span>Products<strong>{selected.products || 'Not added'}</strong></span></div><div><Package size={15} /><span>Services<strong>{selected.services || 'Not added'}</strong></span></div><div><Users size={15} /><span>Staff<strong>{selected.staff || 'Not added'}</strong></span></div></div>
+            {selected.exhibitorId && <div className="booth-assigned"><UserCheck size={16} /><span><small>ASSIGNED EXHIBITOR</small><strong>{selected.exhibitorId.name}</strong></span></div>}
             {selected.requestedBy?.length > 0 && (
-              <div>
-                <h3>Requests</h3>
+              <div className="booth-requests">
+                <h3>Booth requests</h3>
                 {selected.requestedBy.map((person) => (
-                  <p key={person._id}>
-                    {person.name} · {person.email}
-                  </p>
+                  <div key={person._id}><span>{person.name}</span><small>{person.email}</small></div>
                 ))}
               </div>
             )}
             {!selected.exhibitorId && (
               <>
-                <label className="workspace-field">
+                <label className="workspace-field booth-assign-field">
                   <span>Approved exhibitor</span>
                   <select value={assignee} onChange={(event) => setAssignee(event.target.value)}>
                     <option value="">Select exhibitor</option>
@@ -299,17 +282,14 @@ export default function BoothsPage() {
                       ))}
                   </select>
                 </label>
-                <button className="dash-primary" disabled={busy || !assignee} onClick={assign}>
-                  Assign booth
+                <button className="dash-primary booth-assign-button" disabled={busy || !assignee} onClick={assign}>
+                  <UserCheck size={15} /> Assign booth
                 </button>
               </>
             )}
-            <button className="outline-button" onClick={editBooth}>
-              Edit booth
+            <div className="booth-detail-actions"><button className="outline-button" onClick={editBooth}><Edit3 size={14} /> Edit booth
             </button>
-            <button className="danger-button" disabled={busy} onClick={remove}>
-              Delete booth
-            </button>
+            <button className="danger-button" disabled={busy} onClick={remove}><Trash2 size={14} /> Delete booth</button></div>
           </aside>
         )}
       </div>

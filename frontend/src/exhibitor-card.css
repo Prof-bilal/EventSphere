@@ -1,0 +1,201 @@
+.exhibitor-grid {
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.exhibitor-card {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr) minmax(220px, .7fr);
+  gap: 30px;
+  align-items: stretch;
+  min-height: 250px;
+  padding: 27px 30px;
+  border: 1px solid #e9e0d6;
+  border-radius: 9px;
+  background: #fffdf9;
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+
+.exhibitor-card:hover {
+  transform: translateY(-3px);
+  border-color: #d9c8bb;
+  box-shadow: 0 16px 30px rgba(70, 45, 31, .08);
+}
+
+.exhibitor-card-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 22px;
+}
+
+.exhibitor-logo,
+.exhibitor-card-logo-image {
+  width: 76px;
+  height: 76px;
+  margin: 0;
+  border-radius: 22px;
+}
+
+.exhibitor-card-logo-image {
+  object-fit: cover;
+  border: 1px solid #eaded4;
+  background: #f5e7dd;
+}
+
+.exhibitor-card-category,
+.exhibitor-card-connect-label {
+  color: #a45a3d;
+  font: 700 9px Manrope, sans-serif;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+}
+
+.exhibitor-card-content {
+  min-width: 0;
+  padding: 4px 0;
+}
+
+.exhibitor-card-content h2 {
+  font-size: 29px;
+  line-height: 1.1;
+  letter-spacing: -1.1px;
+  overflow-wrap: anywhere;
+}
+
+.exhibitor-card-description {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: #7c6d64;
+  font-size: 12px;
+  line-height: 1.65;
+  margin-top: 12px;
+}
+
+.exhibitor-card-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.exhibitor-card-facts div {
+  min-width: 0;
+  padding-top: 12px;
+  border-top: 1px solid #eee7df;
+}
+
+.exhibitor-card-facts span {
+  display: block;
+  color: #a08d80;
+  font-size: 9px;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+}
+
+.exhibitor-card-facts strong {
+  display: block;
+  overflow: hidden;
+  color: #514640;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+  margin-top: 6px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.exhibitor-card-connect {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-width: 0;
+  padding: 4px 0 0 27px;
+  border-left: 1px solid #eee7df;
+}
+
+.exhibitor-card-person {
+  display: grid;
+  gap: 7px;
+  margin-top: 17px;
+}
+
+.exhibitor-card-person strong {
+  color: #514640;
+  font-size: 12px;
+}
+
+.exhibitor-card-person span,
+.exhibitor-card-booths {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #887a70;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.exhibitor-card-person svg,
+.exhibitor-card-booths svg {
+  color: #c56a4a;
+  flex-shrink: 0;
+}
+
+.exhibitor-card-booths {
+  align-items: flex-start;
+  margin-top: 15px;
+}
+
+.exhibitor-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 22px;
+}
+
+.exhibitor-card-actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 0 11px;
+  border: 1px solid #e6d8ce;
+  border-radius: 5px;
+  color: #a45a3d;
+  font-size: 10px;
+  font-weight: 600;
+  transition: background .2s ease, border-color .2s ease;
+}
+
+.exhibitor-card-actions a:hover {
+  background: #fbe8de;
+  border-color: #d9b8a6;
+}
+
+@media (max-width: 760px) {
+  .exhibitor-card {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    min-height: 0;
+    padding: 23px 21px;
+  }
+
+  .exhibitor-card-brand {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .exhibitor-card-connect {
+    padding: 20px 0 0;
+    border-top: 1px solid #eee7df;
+    border-left: 0;
+  }
+
+  .exhibitor-card-actions a {
+    flex: 1;
+  }
+}

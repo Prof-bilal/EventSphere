@@ -163,7 +163,7 @@ export default function ExposPage() {
       {!loading && !filtered.length && <p className="empty-state">No expos found.</p>}
       <div className="dash-grid">
         {filtered.map((expo) => (
-          <article className="dash-card" key={expo._id}>
+          <article className="dash-card expo-record" key={expo._id}>
             {expo.imageUrl && <img className="record-image" src={expo.imageUrl} alt={expo.title} />}
             <span className="status-pill">{expo.status}</span>
             <h2>{expo.title}</h2>

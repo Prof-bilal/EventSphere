@@ -45,7 +45,17 @@ export default function SessionFormPage() {
   }, [editId])
 
   function update(event) {
-    setValues({ ...values, [event.target.name]: event.target.value })
+    const { name, value } = event.target
+    if (name === 'expoId') {
+      const selectedExpo = expos.find((expo) => expo._id === value)
+      setValues({
+        ...values,
+        expoId: value,
+        startDate: selectedExpo?.startDate ? selectedExpo.startDate.slice(0, 10) : '',
+      })
+      return
+    }
+    setValues({ ...values, [name]: value })
   }
 
   async function submit(event) {
@@ -68,6 +78,8 @@ export default function SessionFormPage() {
     setBusy(false)
   }
 
+  const selectedExpo = expos.find((expo) => expo._id === values.expoId)
+
   return (
     <div className="dash-view">
       <div className="page-intro">
@@ -84,7 +96,8 @@ export default function SessionFormPage() {
       {loading ? (
         <p>Loading form...</p>
       ) : (
-        <form className="workspace-form" onSubmit={submit}>
+        <form className="workspace-form session-form" onSubmit={submit}>
+          <div className="session-form-heading"><div><span className="dash-eyebrow">SESSION SETUP</span><h2>{editId ? 'Update session details' : 'Build the schedule'}</h2></div><span>{selectedExpo ? `${selectedExpo.title} · ${selectedExpo.location}` : 'Choose an expo to begin'}</span></div>
           <div className="form-grid">
             <label className="workspace-field">
               <span>Expo</span>
@@ -140,8 +153,11 @@ export default function SessionFormPage() {
                 type="date"
                 value={values.startDate}
                 onChange={update}
+                min={selectedExpo?.startDate?.slice(0, 10)}
+                max={selectedExpo?.endDate?.slice(0, 10)}
                 required
               />
+              {selectedExpo && <small className="session-date-hint">Expo dates: {new Date(selectedExpo.startDate).toLocaleDateString()} – {new Date(selectedExpo.endDate).toLocaleDateString()}</small>}
             </label>
             <label className="workspace-field">
               <span>Capacity</span>
@@ -181,9 +197,7 @@ export default function SessionFormPage() {
               />
             </label>
           </div>
-          <button className="dash-primary" disabled={busy}>
-            {busy ? 'Saving...' : 'Save session'}
-          </button>
+          <div className="session-form-footer"><p>{selectedExpo ? 'The session date is prefilled from the expo start date.' : 'Select an expo to prefill the session date.'}</p><button className="dash-primary" disabled={busy || !values.expoId}>{busy ? 'Saving...' : 'Save session'}</button></div>
         </form>
       )}
     </div>

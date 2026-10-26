@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { FileText, MessageSquareText, Pencil, UserRound } from 'lucide-react'
 import { api } from '../../../api'
 
 export default function ApplicationsPage() {
@@ -106,30 +107,17 @@ export default function ApplicationsPage() {
       {loading && <p>Loading applications...</p>}
       {!loading && !applications.length && <p className="empty-state">No applications yet.</p>}
       {applications.map((item) => (
-        <article className="dash-card" key={item._id}>
-          <span className="status-pill">{item.ApplicationStatus}</span>
-          <h3>{item.expoId?.title || 'Deleted expo'}</h3>
-          <p>{item.exhibitorId?.name}</p>
-          <p>{item.remarks}</p>
+        <article className="application-record" key={item._id}>
+          <div className="application-record-header"><div className="application-record-title"><span className="application-mark"><FileText size={18} /></span><div><span className={`application-status application-status-${item.ApplicationStatus?.toLowerCase().replace(/\s+/g, '-')}`}>{item.ApplicationStatus}</span><h3>{item.expoId?.title || 'Deleted expo'}</h3></div></div><span className="application-record-id">Your application</span></div>
+          <div className="application-record-details"><span><UserRound size={14} /> {item.exhibitorId?.name || 'Your company profile'}</span>{item.remarks && <span><MessageSquareText size={14} /> {item.remarks}</span>}</div>
           {item.ApplicationStatus === 'Applied' && (
-            <button
-              className="outline-button"
-              onClick={() => {
+            <div className="application-edit-row"><button className="application-edit-button" onClick={() => {
                 setEditId(item._id)
                 setExpoId(item.expoId._id)
                 window.scrollTo(0, 0)
-              }}
-            >
-              Add documents to this application
-            </button>
+              }}><Pencil size={14} /> Add documents to this application</button></div>
           )}
-          <div className="record-actions">
-            {item.submittedDocuments.map((path, index) => (
-              <a className="text-link" key={path} href={path} target="_blank" rel="noreferrer">
-                Document {index + 1}
-              </a>
-            ))}
-          </div>
+          <div className="application-documents"><span className="dash-eyebrow">YOUR DOCUMENTS</span><div className="application-document-list">{(item.submittedDocuments || []).map((path, index) => <a className="application-document" key={path} href={path} target="_blank" rel="noreferrer"><FileText size={16} /><span><strong>Document {index + 1}</strong><small>Open document ↗</small></span></a>)}</div></div>
         </article>
       ))}
     </div>

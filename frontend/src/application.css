@@ -1,0 +1,216 @@
+.application-record {
+  margin-bottom: 14px;
+  padding: 22px 24px;
+  border: 1px solid #e8ded4;
+  border-radius: 10px;
+  background: #fffdf9;
+  box-shadow: 0 8px 24px rgba(44, 31, 22, .035);
+}
+
+.application-record-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.application-record-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.application-mark {
+  display: grid;
+  width: 39px;
+  height: 39px;
+  place-items: center;
+  border-radius: 11px;
+  color: #c75b3d;
+  background: #fae8df;
+}
+
+.application-status {
+  display: inline-flex;
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: #9b653b;
+  background: #fff1d8;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.application-status-approved {
+  color: #4f7759;
+  background: #e7f2e8;
+}
+
+.application-status-rejected {
+  color: #a44d3b;
+  background: #fbe7e2;
+}
+
+.application-record h3 {
+  margin: 7px 0 0;
+  color: #3a3134;
+  font-size: 19px;
+  letter-spacing: -.02em;
+}
+
+.application-record-id {
+  color: #a7978d;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.application-record-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin: 18px 0;
+  padding: 13px 0;
+  border-top: 1px solid #eee5dc;
+  border-bottom: 1px solid #eee5dc;
+  color: #887970;
+  font-size: 11px;
+}
+
+.application-record-details span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.application-record-details svg {
+  color: #c56c4f;
+}
+
+.application-documents > .dash-eyebrow {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.application-document-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.application-document {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 150px;
+  padding: 10px 12px;
+  border: 1px solid #e8d5c9;
+  border-radius: 7px;
+  color: #c15d40;
+  background: #fff8f3;
+  text-decoration: none;
+}
+
+.application-document:hover {
+  border-color: #d58b72;
+  background: #fff0e9;
+}
+
+.application-document span {
+  display: grid;
+  gap: 3px;
+}
+
+.application-document strong {
+  color: #58474a;
+  font-size: 11px;
+}
+
+.application-document small {
+  color: #a08e83;
+  font-size: 9px;
+}
+
+.application-review-actions,
+.application-edit-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+  padding-top: 17px;
+  border-top: 1px solid #eee5dc;
+}
+
+.application-review-actions button,
+.application-edit-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 13px;
+  border-radius: 6px;
+  cursor: pointer;
+  font: 600 10px Manrope;
+}
+
+.application-review-approve {
+  border: 1px solid #bcd7bf;
+  color: #4e7457;
+  background: #edf7ee;
+}
+
+.application-review-approve:hover:not(:disabled) {
+  background: #dff0e1;
+}
+
+.application-review-reject {
+  border: 1px solid #e5c4bb;
+  color: #a44d3b;
+  background: #fff7f4;
+}
+
+.application-review-reject:hover:not(:disabled) {
+  background: #fbe7e2;
+}
+
+.application-review-actions button:disabled {
+  cursor: wait;
+  opacity: .55;
+}
+
+.application-edit-button {
+  border: 1px solid #dfcfc3;
+  color: #98604c;
+  background: #fffaf6;
+}
+
+.application-edit-button:hover {
+  border-color: #d18b70;
+  background: #fff0e9;
+}
+
+@media (max-width: 600px) {
+  .application-record {
+    padding: 19px;
+  }
+
+  .application-record-header {
+    flex-direction: column;
+  }
+
+  .application-record-id {
+    margin-left: 51px;
+  }
+
+  .application-review-actions,
+  .application-edit-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .application-review-actions button,
+  .application-edit-button {
+    width: 100%;
+  }
+}
