@@ -96,7 +96,7 @@ export default function ExhibitorsPage() {
                 <a className="text-link" href={'mailto:' + item.UserId?.email}>
                   Email exhibitor
                 </a>
-                <Link className="text-link" to={'/attendee/messages?userId=' + item.UserId?._id}>
+              <Link className="text-link" to={'/dashboard/messages?userId=' + item.UserId?._id}>
                   Send message
                 </Link>
               </div>

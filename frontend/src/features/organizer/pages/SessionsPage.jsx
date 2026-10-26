@@ -48,7 +48,7 @@ export default function SessionsPage() {
           <span className="dash-eyebrow">SCHEDULE</span>
           <h1>Make time for good ideas.</h1>
         </div>
-        <Link className="dash-primary" to="/organizer/sessions/new">
+        <Link className="dash-primary" to="/dashboard/sessions/new">
           Add session
         </Link>
       </div>
@@ -82,7 +82,7 @@ export default function SessionsPage() {
               </small>
             </div>
             <div className="record-actions">
-              <Link className="outline-button" to={'/organizer/sessions/' + item._id + '/edit'}>
+              <Link className="outline-button" to={'/dashboard/sessions/' + item._id + '/edit'}>
                 Edit
               </Link>
               <button className="danger-button" disabled={busy} onClick={() => remove(item._id)}>

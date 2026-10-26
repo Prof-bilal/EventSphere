@@ -6,14 +6,33 @@ export default function RegistrationsPage() {
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [drafts, setDrafts] = useState({})
+  const [busy, setBusy] = useState(false)
 
   async function loadRegistrations() {
     try {
-      setRegistrations(await api('/expoRegistration/register'))
+      const data = await api('/expoRegistration/register')
+      setRegistrations(data)
+      setDrafts(
+        Object.fromEntries(
+          data.map((item) => [item._id, { badgeNumber: item.badgeNumber || item.registrationNumber, boothNumber: item.boothNumber || '' }]),
+        ),
+      )
     } catch (error) {
       setError(error.message)
     }
     setLoading(false)
+  }
+
+  async function saveDetails(id) {
+    setBusy(true)
+    try {
+      await api('/expoRegistration/register/' + id + '/details', 'PUT', drafts[id])
+      await loadRegistrations()
+    } catch (error) {
+      setError(error.message)
+    }
+    setBusy(false)
   }
   useEffect(() => {
     loadRegistrations()
@@ -59,9 +78,12 @@ export default function RegistrationsPage() {
             <tr>
               <th>Attendee</th>
               <th>Expo</th>
-              <th>Registration</th>
+              <th>Badge</th>
+              <th>Booth</th>
+              <th>Contact</th>
               <th>Status</th>
               <th>Attendance</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -69,9 +91,35 @@ export default function RegistrationsPage() {
               <tr key={item._id}>
                 <td>{item.attendeeId?.name || 'Deleted user'}</td>
                 <td>{item.expoId?.title || 'Deleted expo'}</td>
-                <td>{item.registrationNumber}</td>
+                <td>
+                  <input
+                    className="table-input"
+                    value={drafts[item._id]?.badgeNumber || ''}
+                    onChange={(event) =>
+                      setDrafts({ ...drafts, [item._id]: { ...drafts[item._id], badgeNumber: event.target.value } })
+                    }
+                    aria-label={`Badge number for ${item.attendeeId?.name || 'attendee'}`}
+                  />
+                </td>
+                <td>
+                  <input
+                    className="table-input"
+                    value={drafts[item._id]?.boothNumber || ''}
+                    onChange={(event) =>
+                      setDrafts({ ...drafts, [item._id]: { ...drafts[item._id], boothNumber: event.target.value } })
+                    }
+                    placeholder="Unassigned"
+                    aria-label={`Booth number for ${item.attendeeId?.name || 'attendee'}`}
+                  />
+                </td>
+                <td>{item.phone || item.attendeeId?.email || '—'}</td>
                 <td>{item.status}</td>
                 <td>{item.attendanceStatus}</td>
+              <td>
+                <button className="outline-button" disabled={busy} onClick={() => saveDetails(item._id)}>
+                  Save
+                </button>
+              </td>
               </tr>
             ))}
           </tbody>

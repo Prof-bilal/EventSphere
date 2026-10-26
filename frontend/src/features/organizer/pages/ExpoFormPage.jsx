@@ -69,7 +69,7 @@ export default function ExpoFormPage() {
         editId ? 'PUT' : 'POST',
         form,
       )
-      navigate('/organizer/expos')
+      navigate('/dashboard/expos')
     } catch (error) {
       setError(error.message)
     }
@@ -80,7 +80,7 @@ export default function ExpoFormPage() {
     <div className="dash-view">
       <div className="page-intro">
         <div>
-          <Link to="/organizer/expos" className="back-link">
+          <Link to="/dashboard/expos" className="back-link">
             Back to expos
           </Link>
           <h1>{editId ? 'Update the event.' : 'Create your next event.'}</h1>

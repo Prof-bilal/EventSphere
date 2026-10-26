@@ -51,7 +51,7 @@ export default function ExposPage() {
           <span className="dash-eyebrow">EXPOS</span>
           <h1>Bring your next event to life.</h1>
         </div>
-        <Link className="dash-primary" to="/organizer/expos/new">
+        <Link className="dash-primary" to="/dashboard/expos/new">
           Create expo
         </Link>
       </div>
@@ -88,7 +88,7 @@ export default function ExposPage() {
               <Link className="text-link" to={'/events/' + expo._id}>
                 View event
               </Link>
-              <Link className="outline-button" to={'/organizer/expos/' + expo._id + '/edit'}>
+              <Link className="outline-button" to={'/dashboard/expos/' + expo._id + '/edit'}>
                 Edit
               </Link>
               <button

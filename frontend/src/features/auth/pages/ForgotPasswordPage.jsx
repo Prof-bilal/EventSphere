@@ -16,14 +16,20 @@ export default function ForgotPasswordPage() {
   })
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [touched, setTouched] = useState(false)
 
   function update(event) {
     setValues({ ...values, [event.target.name]: event.target.value })
+    setTouched(true)
   }
+
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim())
+  const emailError = !values.email.trim() ? 'Email is required.' : !emailValid ? 'Enter a valid email address.' : ''
 
   async function submit(event) {
     event.preventDefault()
     setError('')
+    if (!emailValid) return
 
     setBusy(true)
     try {
@@ -59,7 +65,7 @@ export default function ForgotPasswordPage() {
             </div>
           )}
 
-          <form onSubmit={submit}>
+          <form onSubmit={submit} noValidate>
             <div className="auth-field">
               <label htmlFor="email">Email address</label>
               <div className="auth-input-wrap">
@@ -70,12 +76,12 @@ export default function ForgotPasswordPage() {
                   autoComplete="email"
                   value={values.email}
                   onChange={update}
-                  required
                 />
               </div>
+              {touched && emailError && <small className="auth-validation">{emailError}</small>}
             </div>
 
-            <button className="button button-orange auth-submit" disabled={busy}>
+            <button className="button button-orange auth-submit" disabled={busy || !emailValid}>
               {busy ? 'Please wait...' : 'Send reset link'}
             </button>
           </form>

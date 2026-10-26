@@ -7,6 +7,10 @@ const registerForExpo = async (req, res) => {
     try {
         const { expoId } = req.params;
         const attendeeId = req.user.id;
+        const { phone, organization, jobTitle } = req.body;
+        if (!phone || !/^\d{10,15}$/.test(phone)) {
+            return res.status(400).json({ message: "A valid 10–15 digit phone number is required" });
+        }
         const registrationNumber = Math.floor(100000000 + Math.random() * 900000000);
         const expo = await Expo.findById(expoId);
         if (!expo) {
@@ -34,7 +38,21 @@ const registerForExpo = async (req, res) => {
         if (new Date(expo.registrationDeadline) < new Date()) return res.status(400).json({ message: "Registration deadline has passed" });
         const count = await Registration.countDocuments({ expoId, status: "registered" });
         if (count >= expo.capacity) return res.status(400).json({ message: "Expo is full" });
-        const registration = await Registration.findOneAndUpdate({ expoId, attendeeId }, { $set: { status: "registered", registeredAt: Date.now() }, $setOnInsert: { registrationNumber } }, { new: true, upsert: true, runValidators: true });
+        const registration = await Registration.findOneAndUpdate(
+            { expoId, attendeeId },
+            {
+                $set: {
+                    status: "registered",
+                    registeredAt: Date.now(),
+                    phone,
+                    organization,
+                    jobTitle,
+                    badgeNumber: String(isRegistered?.badgeNumber || isRegistered?.registrationNumber || registrationNumber),
+                },
+                $setOnInsert: { registrationNumber },
+            },
+            { new: true, upsert: true, runValidators: true },
+        );
         req.app.get("io")?.emit("event:updated", { expoId });
         await notifyUser(req.app.get("io"), {
             userId: attendeeId,
@@ -66,7 +84,7 @@ const getRegistrationById = async (req, res) => {
 
 const getAllRegistration = async (req, res) => {
     try {
-        const registrations = await Registration.find().populate("expoId", "title").populate("attendeeId", "name");
+        const registrations = await Registration.find().populate("expoId", "title").populate("attendeeId", "name email");
         return res.status(200).json(registrations);
     } catch (error) {
         return res.status(500).json({ error: error.message })
@@ -112,6 +130,21 @@ const attendeeCount = async (req, res) => {
     }
 }
 
+const updateRegistrationDetails = async (req, res) => {
+    try {
+        const { badgeNumber, boothNumber } = req.body;
+        const registration = await Registration.findByIdAndUpdate(
+            req.params.id,
+            { badgeNumber: badgeNumber?.trim(), boothNumber: boothNumber?.trim() },
+            { new: true, runValidators: true },
+        );
+        if (!registration) return res.status(404).json({ message: "Registration not found" });
+        return res.status(200).json({ message: "Registration details updated", registration });
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+}
+
 const markAttendance = async (req, res) => {
     try {
         const { id } = req.params;
@@ -136,5 +169,6 @@ module.exports = {
     getAllRegistration,
     cancelRegistration,
     attendeeCount,
-    markAttendance
+    markAttendance,
+    updateRegistrationDetails
 }

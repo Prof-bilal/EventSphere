@@ -7,6 +7,7 @@ router.get("/mine", protectedRoute, authorize("attendee"), require("../controlle
 
 router.post("/register/:expoId", protectedRoute, authorize("attendee"), RegisterationController.registerForExpo);
 router.get("/register", protectedRoute, authorize("admin"), RegisterationController.getAllRegistration);
+router.put("/register/:id/details", protectedRoute, authorize("admin"), RegisterationController.updateRegistrationDetails);
 router.get("/register/:expoId", protectedRoute, authorize("attendee"), RegisterationController.getRegistrationById);
 router.put("/register/:id", protectedRoute, authorize("attendee"), RegisterationController.cancelRegistration);
 router.put("/register/attend/:id", protectedRoute, authorize("admin"), RegisterationController.markAttendance);

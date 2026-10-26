@@ -1,32 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ArrowUpRight } from 'lucide-react'
-
-function PublicHeader() {
-  return (
-    <header className="public-header">
-      <Link className="brand" to="/">
-        <span className="brand-mark" aria-hidden="true">
-          <i />
-          <i />
-          <i />
-        </span>
-        EventSphere
-      </Link>
-      <nav>
-        <Link to="/events">Events</Link>
-        <Link to="/exhibitors">Exhibitors</Link>
-        <Link to="/schedule">Schedule</Link>
-        <Link to="/about">About</Link>
-      </nav>
-      <div className="public-header-actions">
-        <Link to="/login">Sign in</Link>
-        <Link className="button button-dark" to="/register">
-          Join EventSphere <ArrowUpRight size={15} />
-        </Link>
-      </div>
-    </header>
-  )
-}
+import { PublicHeader } from '../../../components/layout/PublicLayout'
 
 function PublicLayout({ eyebrow, title, copy, children }) {
   return (

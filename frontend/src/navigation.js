@@ -29,6 +29,7 @@ export const roleDetails = {
       ['analytics', 'Analytics', Activity],
       ['feedback', 'Feedback', Star],
       ['notifications', 'Notifications', Bell],
+      ['messages', 'Messages', MessageCircle],
     ],
   },
   exhibitor: {
@@ -56,6 +57,7 @@ export const roleDetails = {
       ['bookmarks', 'My plans', Bookmark],
       ['feedback', 'Feedback', Star],
       ['notifications', 'Notifications', Bell],
+      ['messages', 'Messages', MessageCircle],
     ],
   },
 }

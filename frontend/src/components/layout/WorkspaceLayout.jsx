@@ -4,15 +4,18 @@ import { Menu, X, Bell, LogOut } from 'lucide-react'
 import { useAuth } from '../../state/AuthContext'
 import { roleDetails } from '../../navigation'
 
-export default function WorkspaceLayout({ role }) {
+export default function WorkspaceLayout() {
   const { user, loading, logout, notifications, notice } = useAuth()
   const [open, setOpen] = useState(false)
   const [error, setError] = useState('')
   const location = useLocation()
   const navigate = useNavigate()
-  const details = roleDetails[role]
   const userRole = user?.role === 'admin' ? 'organizer' : user?.role
+  const role = roleDetails[userRole] ? userRole : null
+  const details = role ? roleDetails[role] : null
   const page = location.pathname.split('/')[2] || 'overview'
+  const initials = user?.name?.trim()?.charAt(0)?.toUpperCase() || '?'
+  const unreadNotifications = notifications.filter((item) => !item.isRead).length
 
   async function signOut() {
     try {
@@ -30,7 +33,7 @@ export default function WorkspaceLayout({ role }) {
       </p>
     )
   if (!user) return <Navigate to="/login" replace />
-  if (userRole !== role) return <Navigate to={`/${userRole}`} replace />
+  if (!role) return <Navigate to="/login" replace />
 
   return (
     <div className="dashboard-page">
@@ -44,18 +47,13 @@ export default function WorkspaceLayout({ role }) {
             <Link
               key={path}
               className={page === path ? 'active' : ''}
-              to={`/${role}/${path === 'overview' ? '' : path}`}
+              to={`/dashboard/${path === 'overview' ? '' : path}`}
               onClick={() => setOpen(false)}
             >
               <Icon size={17} />
               {label}
             </Link>
           ))}
-          {role !== 'exhibitor' && (
-            <Link to={`/${role}/messages`} onClick={() => setOpen(false)}>
-              Messages
-            </Link>
-          )}
         </nav>
       </aside>
       <div className="dashboard-main">
@@ -67,13 +65,29 @@ export default function WorkspaceLayout({ role }) {
           >
             {open ? <X /> : <Menu />}
           </button>
-          <div className="header-title">
-            <span className="dash-header-label">{details.label} workspace</span>
-            <Link to={`/${role}/account`}>{user.name}</Link>
-          </div>
-          <Link to={`/${role}/notifications`} aria-label="Notifications">
-            <Bell size={19} />
-            {notifications.filter((item) => !item.isRead).length}
+          <Link className="dashboard-profile" to="/dashboard/account">
+            <span className="dashboard-profile-avatar" aria-hidden="true">
+              <span>{initials}</span>
+              {user.profileImage && (
+                <img
+                  src={user.profileImage}
+                  alt=""
+                  onError={(event) => (event.currentTarget.style.display = 'none')}
+                />
+              )}
+            </span>
+            <span className="header-title">
+              <span className="dash-header-label">{details.label} workspace</span>
+              <strong>{user.name}</strong>
+            </span>
+          </Link>
+          <Link
+            className="dashboard-notifications"
+            to="/dashboard/notifications"
+            aria-label={`Notifications${unreadNotifications ? `, ${unreadNotifications} unread` : ''}`}
+          >
+            <Bell size={18} />
+            {unreadNotifications > 0 && <span>{unreadNotifications > 9 ? '9+' : unreadNotifications}</span>}
           </Link>
           <button className="outline-button" onClick={signOut}>
             <LogOut size={15} /> Sign out

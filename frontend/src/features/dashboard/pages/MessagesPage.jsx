@@ -67,58 +67,30 @@ export default function MessagesPage() {
           <p>Contact organizers and exhibitors.</p>
         </div>
       </div>
-      {error && (
-        <p className="api-error" role="alert">
-          {error}
-        </p>
-      )}
+      {error && <p className="api-error" role="alert">{error}</p>}
       {loading && <p>Loading contacts...</p>}
       <label className="workspace-field">
         <span>Contact</span>
         <select value={receiverId} onChange={(event) => setReceiverId(event.target.value)}>
           <option value="">Choose a person</option>
-          {contacts.map((person) => (
-            <option key={person._id} value={person._id}>
-              {person.name} · {person.role}
-            </option>
-          ))}
+          {contacts.map((person) => <option key={person._id} value={person._id}>{person.name} · {person.role}</option>)}
         </select>
       </label>
       <div className="message-panel">
         <section>
           <div className="message-list">
-            {!messages.length && (
-              <p className="empty-state">
-                {receiverId ? 'No messages yet. Start the conversation.' : 'Select a contact.'}
-              </p>
-            )}
+            {!messages.length && <p className="empty-state">{receiverId ? 'No messages yet. Start the conversation.' : 'Select a contact.'}</p>}
             {messages.map((item) => (
-              <article
-                className={item.senderId === user._id ? 'message mine' : 'message'}
-                key={item._id}
-              >
-                <strong>
-                  {item.senderId === user._id
-                    ? 'You'
-                    : contacts.find((person) => person._id === item.senderId)?.name}
-                </strong>
+              <article className={item.senderId === user._id ? 'message mine' : 'message'} key={item._id}>
+                <strong>{item.senderId === user._id ? 'You' : contacts.find((person) => person._id === item.senderId)?.name}</strong>
                 <p>{item.message}</p>
                 <small>{new Date(item.createdAt).toLocaleString()}</small>
               </article>
             ))}
           </div>
           <form onSubmit={send}>
-            <input
-              aria-label="Message"
-              placeholder="Write a message..."
-              value={draft}
-              onChange={(event) => setDraft(event.target.value)}
-              maxLength={2000}
-              required
-            />
-            <button className="dash-primary" disabled={busy || !receiverId}>
-              {busy ? 'Sending...' : 'Send'}
-            </button>
+            <input aria-label="Message" placeholder="Write a message..." value={draft} onChange={(event) => setDraft(event.target.value)} maxLength={2000} required />
+            <button className="dash-primary" disabled={busy || !receiverId}>{busy ? 'Sending...' : 'Send'}</button>
           </form>
         </section>
       </div>

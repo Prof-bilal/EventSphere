@@ -4,6 +4,7 @@ import { api } from '../../../api'
 
 export default function ExposPage() {
   const [expos, setExpos] = useState([])
+  const [applications, setApplications] = useState([])
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -11,7 +12,12 @@ export default function ExposPage() {
 
   async function loadExpos() {
     try {
-      setExpos(await api('/expo/getExpo?status=published'))
+      const [publishedExpos, myApplications] = await Promise.all([
+        api('/expo/getExpo?status=published'),
+        api('/exhibitorApplication/getMyApplications'),
+      ])
+      setExpos(publishedExpos)
+      setApplications(myApplications.applications || [])
 
       setError('')
     } catch (error) {
@@ -29,6 +35,10 @@ export default function ExposPage() {
   const filtered = expos.filter((expo) =>
     (expo.title + ' ' + expo.location).toLowerCase().includes(search.toLowerCase()),
   )
+
+  function applicationFor(expoId) {
+    return applications.find((item) => (item.expoId?._id || item.expoId) === expoId)
+  }
 
   return (
     <div className="dash-view">
@@ -71,9 +81,15 @@ export default function ExposPage() {
               <Link className="text-link" to={'/events/' + expo._id}>
                 View event
               </Link>
-              <Link className="dash-primary" to={'/exhibitor/applications?expoId=' + expo._id}>
-                Apply for expo
-              </Link>
+              {applicationFor(expo._id)?.ApplicationStatus ? (
+                <button className="outline-button" disabled>
+                  {applicationFor(expo._id).ApplicationStatus}
+                </button>
+              ) : (
+                <Link className="dash-primary" to={'/dashboard/applications?expoId=' + expo._id}>
+                  Apply
+                </Link>
+              )}
             </div>
           </article>
         ))}

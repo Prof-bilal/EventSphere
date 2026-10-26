@@ -1,4 +1,5 @@
 const User = require("../model/Usermodel");
+const Exhibitor = require("../model/exhibitorProfilemodel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
@@ -9,7 +10,20 @@ const { notifyUser } = require("../services/NotificationService");
 const registerUser = async (req, res) => {
 
     try {
-        const { name, email, password, phone, role } = req.body;
+        const {
+            name,
+            email,
+            password,
+            phone,
+            role,
+            CompanyName,
+            description,
+            products,
+            services,
+            website,
+            contactPerson,
+            category,
+        } = req.body;
 
         const allowedRegistrationRoles = ["attendee", "exhibitor"];
         const selectedRole = role || "attendee";
@@ -17,6 +31,15 @@ const registerUser = async (req, res) => {
         if (!allowedRegistrationRoles.includes(selectedRole)) {
             return res.status(400).json({
                 message: "Public registration is only available for attendees and exhibitors",
+            });
+        }
+
+        if (
+            selectedRole === "exhibitor" &&
+            (!CompanyName || !description || !contactPerson || !phone)
+        ) {
+            return res.status(400).json({
+                message: "Company name, description, contact person, and phone are required for exhibitors",
             });
         }
 
@@ -61,9 +84,21 @@ const registerUser = async (req, res) => {
             emailVerificationTokenExpires,
         });
 
-        await sendEmail(newUser.email, newUser.name, emailVerificationToken);
-
         await newUser.save();
+        if (selectedRole === "exhibitor") {
+            await Exhibitor.create({
+                CompanyName,
+                description,
+                products,
+                services,
+                website,
+                contactPerson,
+                phone,
+                category: category || "General",
+                UserId: newUser._id,
+            });
+        }
+        await sendEmail(newUser.email, newUser.name, emailVerificationToken);
         if (selectedRole === "exhibitor") {
             res.status(201).json({ message: "User registered successfully. Your account is pending approval." });
         } else {
@@ -203,8 +238,17 @@ const rejectExhibitor = async (req, res) => {
 
 const getUsers = async (req, res) => {
     try {
-        const users = await User.find().select("-password -emailVerificationToken -passwordResetToken");
-        return res.status(200).json(users);
+        const users = await User.find().select("-password -emailVerificationToken -passwordResetToken").lean();
+        const exhibitorIds = users.filter((user) => user.role === "exhibitor").map((user) => user._id);
+        const profiles = await Exhibitor.find({ UserId: { $in: exhibitorIds } })
+            .select("CompanyName description products services website contactPerson phone category UserId")
+            .lean();
+        const profileByUserId = new Map(profiles.map((profile) => [profile.UserId.toString(), profile]));
+        const usersWithProfiles = users.map((user) => ({
+            ...user,
+            companyProfile: profileByUserId.get(user._id.toString()) || null,
+        }));
+        return res.status(200).json(usersWithProfiles);
     }
     catch (error) {
         return res.status(500).json({ error: error.message });

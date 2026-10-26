@@ -46,6 +46,7 @@ export default function ApplicationsPage() {
       setEditId('')
       setDocuments([])
       event.target.reset()
+      window.dispatchEvent(new Event('event-updated'))
       await loadApplications()
     } catch (error) {
       setError(error.message)
@@ -99,7 +100,7 @@ export default function ApplicationsPage() {
           />
         </label>
         <button className="dash-primary" disabled={busy}>
-          {busy ? 'Submitting...' : editId ? 'Add documents' : 'Apply for expo'}
+          {busy ? 'Submitting...' : editId ? 'Add documents' : 'Apply'}
         </button>
       </form>
       {loading && <p>Loading applications...</p>}

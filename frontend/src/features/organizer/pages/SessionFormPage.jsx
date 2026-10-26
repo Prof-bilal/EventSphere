@@ -61,7 +61,7 @@ export default function SessionFormPage() {
         editId ? 'PUT' : 'POST',
         values,
       )
-      navigate('/organizer/sessions')
+      navigate('/dashboard/sessions')
     } catch (error) {
       setError(error.message)
     }
@@ -72,7 +72,7 @@ export default function SessionFormPage() {
     <div className="dash-view">
       <div className="page-intro">
         <div>
-          <Link to="/organizer/sessions">Back to schedule</Link>
+          <Link to="/dashboard/sessions">Back to schedule</Link>
           <h1>{editId ? 'Update the session.' : 'Add a new session.'}</h1>
         </div>
       </div>

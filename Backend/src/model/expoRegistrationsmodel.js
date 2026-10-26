@@ -15,6 +15,25 @@ const registrationSchema = new mongoose.Schema({
         type : Number,
         unique : true,
     },
+    badgeNumber: {
+        type: String,
+    },
+    boothNumber: {
+        type: String,
+        trim: true,
+    },
+    phone: {
+        type: String,
+        trim: true,
+    },
+    organization: {
+        type: String,
+        trim: true,
+    },
+    jobTitle: {
+        type: String,
+        trim: true,
+    },
     registeredAt: {
         type: Date,
         default: Date.now

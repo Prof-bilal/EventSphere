@@ -60,6 +60,11 @@ export default function BookmarksPage() {
                 <p>
                   {item.status} · #{item.registrationNumber}
                 </p>
+                {item.status === 'registered' && (
+                  <Link className="text-link" to={`/attendee/pass/${item._id}`}>
+                    View / print pass →
+                  </Link>
+                )}
               </div>
               {item.status === 'registered' && (
                 <button className="outline-button" disabled={busy} onClick={() => cancel(item._id)}>
@@ -82,7 +87,7 @@ export default function BookmarksPage() {
               </div>
             </article>
           ))}
-          <Link className="text-link" to="/attendee/sessions">
+          <Link className="text-link" to="/dashboard/sessions">
             Manage session registrations
           </Link>
         </section>
@@ -99,7 +104,7 @@ export default function BookmarksPage() {
               </div>
             </article>
           ))}
-          <Link className="text-link" to="/attendee/sessions">
+          <Link className="text-link" to="/dashboard/sessions">
             Browse sessions
           </Link>
         </section>

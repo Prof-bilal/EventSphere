@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../../../api'
 import { useAuth } from '../../../state/AuthContext'
@@ -15,16 +16,26 @@ export default function ResetPasswordPage() {
     role: params.get('role') === 'exhibitor' ? 'exhibitor' : 'attendee',
   })
   const [visible, setVisible] = useState(false)
+  const [confirmVisible, setConfirmVisible] = useState(false)
+  const [touched, setTouched] = useState({})
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
   function update(event) {
     setValues({ ...values, [event.target.name]: event.target.value })
+    setTouched({ ...touched, [event.target.name]: true })
   }
+
+  const passwordValid = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(values.password)
+  const passwordsMatch = values.password === values.confirmPassword && values.confirmPassword.length > 0
+  const passwordError = !values.password ? 'Password is required.' : !passwordValid ? 'Use 8+ characters with uppercase, lowercase, number, and symbol.' : ''
+  const confirmError = !values.confirmPassword ? 'Please confirm your password.' : !passwordsMatch ? 'Passwords do not match.' : ''
 
   async function submit(event) {
     event.preventDefault()
     setError('')
+    if (!passwordValid || !passwordsMatch || !params.get('token')) return
+
     if (values.password !== values.confirmPassword) {
       setError('Passwords do not match.')
       return
@@ -80,7 +91,7 @@ export default function ResetPasswordPage() {
               <Link to="/forgot-password">request a new link</Link>.
             </p>
           )}
-          <form onSubmit={submit}>
+          <form onSubmit={submit} noValidate>
             <div className="auth-field">
               <label htmlFor="password">New password</label>
               <div className="auth-input-wrap">
@@ -91,17 +102,18 @@ export default function ResetPasswordPage() {
                   autoComplete="new-password"
                   value={values.password}
                   onChange={update}
-                  minLength={8}
-                  required
                 />
                 <button
                   type="button"
                   className="password-toggle"
                   onClick={() => setVisible(!visible)}
+                  aria-label={visible ? 'Hide password' : 'Show password'}
+                  title={visible ? 'Hide password' : 'Show password'}
                 >
-                  {visible ? 'Hide' : 'Show'}
+                  {visible ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
+              {touched.password && passwordError && <small className="auth-validation">{passwordError}</small>}
             </div>
             <div className="auth-field">
               <label htmlFor="confirmPassword">Confirm password</label>
@@ -109,13 +121,22 @@ export default function ResetPasswordPage() {
                 <input
                   id="confirmPassword"
                   name="confirmPassword"
-                  type="password"
+                  type={confirmVisible ? 'text' : 'password'}
                   autoComplete="new-password"
                   value={values.confirmPassword}
                   onChange={update}
-                  required
                 />
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setConfirmVisible(!confirmVisible)}
+                  aria-label={confirmVisible ? 'Hide confirmed password' : 'Show confirmed password'}
+                  title={confirmVisible ? 'Hide confirmed password' : 'Show confirmed password'}
+                >
+                  {confirmVisible ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
+              {touched.confirmPassword && confirmError && <small className="auth-validation">{confirmError}</small>}
               <p className="field-hint">
                 Use 8 or more characters with uppercase, lowercase, a number and a symbol (@$!%*?&).
               </p>
@@ -123,7 +144,7 @@ export default function ResetPasswordPage() {
 
             <button
               className="button button-orange auth-submit"
-              disabled={busy || !params.get('token')}
+              disabled={busy || !params.get('token') || !passwordValid || !passwordsMatch}
             >
               {busy ? 'Please wait...' : 'Reset password'}
             </button>

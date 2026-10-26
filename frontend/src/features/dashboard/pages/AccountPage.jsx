@@ -37,50 +37,23 @@ export default function AccountPage() {
           <h1>Your personal details.</h1>
         </div>
       </div>
-      {error && (
-        <p className="api-error" role="alert">
-          {error}
-        </p>
-      )}
-      {message && (
-        <p className="api-message" role="status">
-          {message}
-        </p>
-      )}
+      {error && <p className="api-error" role="alert">{error}</p>}
+      {message && <p className="api-message" role="status">{message}</p>}
       <form className="workspace-form" onSubmit={save}>
         <label className="workspace-field">
           <span>Name</span>
-          <input
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            required
-            minLength={3}
-            maxLength={30}
-          />
+          <input value={name} onChange={(event) => setName(event.target.value)} required minLength={3} maxLength={30} />
         </label>
         <label className="workspace-field">
           <span>Phone</span>
-          <input
-            value={phone}
-            onChange={(event) => setPhone(event.target.value)}
-            pattern="[0-9]{10,15}"
-            placeholder="10–15 digits"
-          />
+          <input value={phone} onChange={(event) => setPhone(event.target.value)} pattern="[0-9]{10,15}" placeholder="10–15 digits" />
         </label>
         <label className="workspace-field">
           <span>Profile image</span>
-          <input
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            onChange={(event) => setImage(event.target.files[0])}
-          />
+          <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => setImage(event.target.files[0])} />
         </label>
-        {user.profileImage && (
-          <img className="company-logo" src={user.profileImage} alt={user.name} />
-        )}
-        <button className="dash-primary" disabled={busy}>
-          {busy ? 'Saving...' : 'Save account'}
-        </button>
+        {user.profileImage && <img className="company-logo" src={user.profileImage} alt={user.name} />}
+        <button className="dash-primary" disabled={busy}>{busy ? 'Saving...' : 'Save account'}</button>
       </form>
     </div>
   )

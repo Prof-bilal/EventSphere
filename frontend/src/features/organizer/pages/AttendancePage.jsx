@@ -7,6 +7,7 @@ export default function AttendancePage() {
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [badgeNumber, setBadgeNumber] = useState('')
 
   async function loadRegistrations() {
     try {
@@ -28,6 +29,19 @@ export default function AttendancePage() {
       setError(error.message)
     }
     setBusy(false)
+  }
+
+  async function markByBadge(event) {
+    event.preventDefault()
+    const registration = registrations.find(
+      (item) => String(item.badgeNumber || item.registrationNumber) === badgeNumber.trim(),
+    )
+    if (!registration) {
+      setError('No registered attendee found with that badge number.')
+      return
+    }
+    await markPresent(registration._id)
+    setBadgeNumber('')
   }
   const filtered = registrations.filter((item) =>
     (
@@ -56,6 +70,20 @@ export default function AttendancePage() {
         placeholder="Search attendees or expos"
         aria-label="Search registrations"
       />
+      <form className="attendance-badge-form" onSubmit={markByBadge} noValidate>
+        <label>
+          <span>Enter badge number</span>
+          <input
+            value={badgeNumber}
+            onChange={(event) => setBadgeNumber(event.target.value)}
+            placeholder="Scan or enter badge number"
+            required
+          />
+        </label>
+        <button className="dash-primary" disabled={busy || !badgeNumber.trim()}>
+          Mark present
+        </button>
+      </form>
       {error && (
         <p className="api-error" role="alert">
           {error}
@@ -70,6 +98,8 @@ export default function AttendancePage() {
               <th>Attendee</th>
               <th>Expo</th>
               <th>Registration</th>
+              <th>Badge</th>
+              <th>Booth</th>
               <th>Status</th>
               <th>Attendance</th>
               <th>Action</th>
@@ -81,6 +111,8 @@ export default function AttendancePage() {
                 <td>{item.attendeeId?.name || 'Deleted user'}</td>
                 <td>{item.expoId?.title || 'Deleted expo'}</td>
                 <td>{item.registrationNumber}</td>
+                <td>{item.badgeNumber || item.registrationNumber}</td>
+                <td>{item.boothNumber || '—'}</td>
                 <td>{item.status}</td>
                 <td>{item.attendanceStatus}</td>
                 <td>

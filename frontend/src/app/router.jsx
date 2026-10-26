@@ -1,10 +1,11 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import HomePage from '../features/public/pages/HomePage'
 import LoginPage from '../features/auth/pages/LoginPage'
 import RegisterPage from '../features/auth/pages/RegisterPage'
 import ForgotPasswordPage from '../features/auth/pages/ForgotPasswordPage'
 import ResetPasswordPage from '../features/auth/pages/ResetPasswordPage'
 import AuthStatusPage from '../features/auth/components/AuthStatusPage'
+import PublicOnlyRoute from '../features/auth/components/PublicOnlyRoute'
 import AboutPage from '../features/public/pages/AboutPage'
 import ContactPage from '../features/public/pages/ContactPage'
 import EventDetailPage from '../features/public/pages/EventDetailPage'
@@ -13,48 +14,36 @@ import ExhibitorsPage from '../features/public/pages/ExhibitorsPage'
 import FloorPlanPage from '../features/public/pages/FloorPlanPage'
 import SchedulePage from '../features/public/pages/SchedulePage'
 import WorkspaceLayout from '../components/layout/WorkspaceLayout'
-import OrganizerOverviewPage from '../features/organizer/pages/OverviewPage'
-import OrganizerExposPage from '../features/organizer/pages/ExposPage'
-import ExpoFormPage from '../features/organizer/pages/ExpoFormPage'
-import ApplicationsPage from '../features/organizer/pages/ApplicationsPage'
-import BoothsPage from '../features/organizer/pages/BoothsPage'
-import SessionsPage from '../features/organizer/pages/SessionsPage'
-import SessionFormPage from '../features/organizer/pages/SessionFormPage'
-import RegistrationsPage from '../features/organizer/pages/RegistrationsPage'
-import AnalyticsPage from '../features/organizer/pages/AnalyticsPage'
-import FeedbackPage from '../features/organizer/pages/FeedbackPage'
-import NotificationsPage from '../features/organizer/pages/NotificationsPage'
-import UserManagementPage from '../features/organizer/pages/UserManagementPage'
-import AttendancePage from '../features/organizer/pages/AttendancePage'
-import ExhibitorOverviewPage from '../features/exhibitor/pages/OverviewPage'
-import ExhibitorProfilePage from '../features/exhibitor/pages/ProfilePage'
-import ExhibitorExposPage from '../features/exhibitor/pages/ExposPage'
-import ExhibitorApplicationsPage from '../features/exhibitor/pages/ApplicationsPage'
-import ExhibitorBoothsPage from '../features/exhibitor/pages/BoothsPage'
-import ExhibitorSessionsPage from '../features/exhibitor/pages/SessionsPage'
-import ExhibitorMessagesPage from '../features/exhibitor/pages/MessagesPage'
-import OrganizerMessagesPage from '../features/organizer/pages/MessagesPage'
-import OrganizerAccountPage from '../features/organizer/pages/AccountPage'
-import ExhibitorAccountPage from '../features/exhibitor/pages/AccountPage'
-import AttendeeAccountPage from '../features/attendee/pages/AccountPage'
-import AttendeeMessagesPage from '../features/attendee/pages/MessagesPage'
-import ExhibitorFeedbackPage from '../features/exhibitor/pages/FeedbackPage'
-import ExhibitorNotificationsPage from '../features/exhibitor/pages/NotificationsPage'
-import AttendeeOverviewPage from '../features/attendee/pages/OverviewPage'
-import AttendeeExposPage from '../features/attendee/pages/ExposPage'
-import AttendeeExhibitorsPage from '../features/attendee/pages/ExhibitorsPage'
-import AttendeeBoothsPage from '../features/attendee/pages/BoothsPage'
-import AttendeeSessionsPage from '../features/attendee/pages/SessionsPage'
-import AttendeeBookmarksPage from '../features/attendee/pages/BookmarksPage'
-import AttendeeFeedbackPage from '../features/attendee/pages/FeedbackPage'
-import AttendeeNotificationsPage from '../features/attendee/pages/NotificationsPage'
+import DashboardPage from '../features/dashboard/DashboardPage'
+import RegistrationPassPage from '../features/attendee/pages/RegistrationPassPage'
+
+function LegacyDashboardRedirect({ role }) {
+  const location = useLocation()
+  const prefix = `/${role}`
+  const suffix = location.pathname.slice(prefix.length)
+  return <Navigate to={`/dashboard${suffix}${location.search}`} replace />
+}
 
 export default function AppRouter() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
+      <Route
+        path="/login"
+        element={
+          <PublicOnlyRoute>
+            <LoginPage />
+          </PublicOnlyRoute>
+        }
+      />
+      <Route
+        path="/register"
+        element={
+          <PublicOnlyRoute>
+            <RegisterPage />
+          </PublicOnlyRoute>
+        }
+      />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/verify-email" element={<AuthStatusPage type="verify" />} />
@@ -71,63 +60,36 @@ export default function AppRouter() {
       <Route path="/floor-plan" element={<FloorPlanPage />} />
       <Route path="/about" element={<AboutPage />} />
       <Route path="/contact" element={<ContactPage />} />
-      <Route path="/organizer" element={<WorkspaceLayout role="organizer" />}>
-        <Route index element={<OrganizerOverviewPage />} />
-        <Route path="expos" element={<OrganizerExposPage />} />
-        <Route path="expos/new" element={<ExpoFormPage />} />
-        <Route path="expos/:editId/edit" element={<ExpoFormPage />} />
-        <Route path="applications" element={<ApplicationsPage />} />
-        <Route path="booths" element={<BoothsPage />} />
-        <Route path="sessions" element={<SessionsPage />} />
-        <Route path="sessions/new" element={<SessionFormPage />} />
-        <Route path="sessions/:editId/edit" element={<SessionFormPage />} />
-        <Route path="registrations" element={<RegistrationsPage />} />
-        <Route path="attendance" element={<AttendancePage />} />
-        <Route path="attendances/d" element={<AttendancePage />} />
-        <Route path="users" element={<UserManagementPage />} />
-        <Route path="analytics" element={<AnalyticsPage />} />
-        <Route path="feedback" element={<FeedbackPage />} />
-        <Route path="notifications" element={<NotificationsPage />} />
+      <Route path="/dashboard" element={<WorkspaceLayout />}>
+        <Route index element={<DashboardPage page="overview" />} />
+        <Route path="expos" element={<DashboardPage page="expos" />} />
+        <Route path="expos/new" element={<DashboardPage page="expoNew" />} />
+        <Route path="expos/:editId/edit" element={<DashboardPage page="expoEdit" />} />
+        <Route path="applications" element={<DashboardPage page="applications" />} />
+        <Route path="profile" element={<DashboardPage page="profile" />} />
+        <Route path="exhibitors" element={<DashboardPage page="exhibitors" />} />
+        <Route path="booths" element={<DashboardPage page="booths" />} />
+        <Route path="sessions" element={<DashboardPage page="sessions" />} />
+        <Route path="sessions/new" element={<DashboardPage page="sessionNew" />} />
+        <Route path="sessions/:editId/edit" element={<DashboardPage page="sessionEdit" />} />
+        <Route path="registrations" element={<DashboardPage page="registrations" />} />
+        <Route path="attendance" element={<DashboardPage page="attendance" />} />
+        <Route path="attendances/d" element={<DashboardPage page="attendance" />} />
+        <Route path="users" element={<DashboardPage page="users" />} />
+        <Route path="analytics" element={<DashboardPage page="analytics" />} />
+        <Route path="bookmarks" element={<DashboardPage page="bookmarks" />} />
+        <Route path="feedback" element={<DashboardPage page="feedback" />} />
+        <Route path="notifications" element={<DashboardPage page="notifications" />} />
+        <Route path="messages" element={<DashboardPage page="messages" />} />
+        <Route path="account" element={<DashboardPage page="account" />} />
       </Route>
-      <Route path="/exhibitor" element={<WorkspaceLayout role="exhibitor" />}>
-        <Route index element={<ExhibitorOverviewPage />} />
-        <Route path="profile" element={<ExhibitorProfilePage />} />
-        <Route path="expos" element={<ExhibitorExposPage />} />
-        <Route path="applications" element={<ExhibitorApplicationsPage />} />
-        <Route path="booths" element={<ExhibitorBoothsPage />} />
-        <Route path="sessions" element={<ExhibitorSessionsPage />} />
-        <Route path="messages" element={<ExhibitorMessagesPage />} />
-        <Route path="feedback" element={<ExhibitorFeedbackPage />} />
-        <Route path="notifications" element={<ExhibitorNotificationsPage />} />
-      </Route>
-      <Route path="/attendee" element={<WorkspaceLayout role="attendee" />}>
-        <Route index element={<AttendeeOverviewPage />} />
-        <Route path="expos" element={<AttendeeExposPage />} />
-        <Route path="exhibitors" element={<AttendeeExhibitorsPage />} />
-        <Route path="booths" element={<AttendeeBoothsPage />} />
-        <Route path="sessions" element={<AttendeeSessionsPage />} />
-        <Route path="bookmarks" element={<AttendeeBookmarksPage />} />
-        <Route path="feedback" element={<AttendeeFeedbackPage />} />
-        <Route path="notifications" element={<AttendeeNotificationsPage />} />
-      </Route>
-      <Route path="/organizer/account" element={<WorkspaceLayout role="organizer" />}>
-        <Route index element={<OrganizerAccountPage />} />
-      </Route>
-      <Route path="/exhibitor/account" element={<WorkspaceLayout role="exhibitor" />}>
-        <Route index element={<ExhibitorAccountPage />} />
-      </Route>
-      <Route path="/attendee/account" element={<WorkspaceLayout role="attendee" />}>
-        <Route index element={<AttendeeAccountPage />} />
-      </Route>
-      <Route path="/organizer/messages" element={<WorkspaceLayout role="organizer" />}>
-        <Route index element={<OrganizerMessagesPage />} />
-      </Route>
-      <Route path="/attendee/messages" element={<WorkspaceLayout role="attendee" />}>
-        <Route index element={<AttendeeMessagesPage />} />
-      </Route>
-      <Route path="/admin/attendance" element={<Navigate to="/organizer/attendance" replace />} />
-      <Route path="/admin/users" element={<Navigate to="/organizer/users" replace />} />
-      <Route path="/admin/*" element={<Navigate to="/organizer" replace />} />
+      <Route path="/attendee/pass/:id" element={<RegistrationPassPage />} />
+      <Route path="/organizer/*" element={<LegacyDashboardRedirect role="organizer" />} />
+      <Route path="/exhibitor/*" element={<LegacyDashboardRedirect role="exhibitor" />} />
+      <Route path="/attendee/*" element={<LegacyDashboardRedirect role="attendee" />} />
+      <Route path="/admin/attendance" element={<Navigate to="/dashboard/attendance" replace />} />
+      <Route path="/admin/users" element={<Navigate to="/dashboard/users" replace />} />
+      <Route path="/admin/*" element={<Navigate to="/dashboard" replace />} />
       <Route
         path="*"
         element={

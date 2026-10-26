@@ -60,6 +60,7 @@ export default function UserManagementPage() {
               <th>Name</th>
               <th>Email</th>
               <th>Role</th>
+              <th>Company</th>
               <th>Approval</th>
               <th>Access</th>
               <th>Actions</th>
@@ -75,6 +76,18 @@ export default function UserManagementPage() {
                   <td>{item.name}</td>
                   <td>{item.email}</td>
                   <td>{item.role}</td>
+                  <td>
+                    {item.companyProfile ? (
+                      <div className="user-company-cell">
+                        <strong>{item.companyProfile.CompanyName}</strong>
+                        <small>
+                          {item.companyProfile.category} · {item.companyProfile.contactPerson}
+                        </small>
+                      </div>
+                    ) : (
+                      '—'
+                    )}
+                  </td>
                   <td>{item.approvalStatus}</td>
                   <td>{item.IsBlocked ? 'Blocked' : 'Active'}</td>
                   <td>

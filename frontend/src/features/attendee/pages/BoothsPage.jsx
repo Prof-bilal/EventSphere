@@ -107,7 +107,7 @@ export default function BoothsPage() {
             {selected.exhibitorId && (
               <Link
                 className="text-link"
-                to={'/attendee/messages?userId=' + selected.exhibitorId._id}
+                to={'/dashboard/messages?userId=' + selected.exhibitorId._id}
               >
                 Contact exhibitor
               </Link>

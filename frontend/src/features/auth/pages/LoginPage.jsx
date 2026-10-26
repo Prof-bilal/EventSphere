@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ArrowRight, Eye, EyeOff } from 'lucide-react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../../../api'
 import { useAuth } from '../../../state/AuthContext'
@@ -15,16 +16,25 @@ export default function LoginPage() {
     role: params.get('role') === 'exhibitor' ? 'exhibitor' : 'attendee',
   })
   const [visible, setVisible] = useState(false)
+  const [touched, setTouched] = useState({})
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
   function update(event) {
     setValues({ ...values, [event.target.name]: event.target.value })
+    setTouched({ ...touched, [event.target.name]: true })
   }
+
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim())
+  const passwordValid = values.password.length >= 6
+  const formValid = emailValid && passwordValid
+  const emailError = !values.email.trim() ? 'Email is required.' : !emailValid ? 'Enter a valid email address.' : ''
+  const passwordError = !values.password ? 'Password is required.' : !passwordValid ? 'Password must be at least 6 characters.' : ''
 
   async function submit(event) {
     event.preventDefault()
     setError('')
+    if (!formValid) return
 
     setBusy(true)
     try {
@@ -34,7 +44,7 @@ export default function LoginPage() {
       })
       localStorage.setItem('token', data.token)
       setUser(data.user)
-      navigate(data.user.role === 'admin' ? '/organizer' : '/' + data.user.role)
+      navigate('/dashboard')
     } catch (error) {
       setError(error.message)
     }
@@ -65,7 +75,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={submit}>
+          <form onSubmit={submit} noValidate>
             <div className="auth-field">
               <label htmlFor="email">Email address</label>
               <div className="auth-input-wrap">
@@ -76,9 +86,9 @@ export default function LoginPage() {
                   autoComplete="email"
                   value={values.email}
                   onChange={update}
-                  required
                 />
               </div>
+              {touched.email && emailError && <small className="auth-validation">{emailError}</small>}
             </div>
             <div className="auth-field">
               <label htmlFor="password">Password</label>
@@ -90,24 +100,26 @@ export default function LoginPage() {
                   autoComplete="current-password"
                   value={values.password}
                   onChange={update}
-                  minLength={6}
-                  required
                 />
                 <button
                   type="button"
                   className="password-toggle"
                   onClick={() => setVisible(!visible)}
+                  aria-label={visible ? 'Hide password' : 'Show password'}
+                  title={visible ? 'Hide password' : 'Show password'}
                 >
-                  {visible ? 'Hide' : 'Show'}
+                  {visible ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
+              {touched.password && passwordError && <small className="auth-validation">{passwordError}</small>}
             </div>
 
             <Link className="forgot-link" to="/forgot-password">
               Forgot your password?
             </Link>
-            <button className="button button-orange auth-submit" disabled={busy}>
-              {busy ? 'Please wait...' : 'Sign in'}
+            <button className="button button-orange auth-submit" disabled={busy || !formValid}>
+              <span>{busy ? 'Please wait...' : 'Sign in'}</span>
+              {!busy && <ArrowRight size={17} />}
             </button>
           </form>
           <p className="auth-switch">
