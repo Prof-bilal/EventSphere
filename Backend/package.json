@@ -6,7 +6,11 @@
   "scripts": {
     "dev": "nodemon src/index.js",
     "start": "node src/index.js",
-    "create-admin": "node src/createAdmin.js"
+    "test": "node --test test/contract.test.js",
+    "create-admin": "node src/createAdmin.js",
+    "seed:demo": "node src/seedDemoUsers.js",
+    "seed:content": "node src/seedContent.js",
+    "backup:db": "node src/backupDatabase.js"
   },
   "keywords": [],
   "author": "",

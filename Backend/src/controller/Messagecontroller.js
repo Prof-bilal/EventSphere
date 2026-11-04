@@ -1,15 +1,25 @@
 const Message = require("../model/Messagemodel");
 const User = require("../model/Usermodel");
 const { notifyUser } = require("../services/NotificationService");
+const mongoose = require("mongoose");
 
 const sendMessage = async (req, res) => {
     try {
         const { receiverId, expoId, message } = req.body;
+        if (!mongoose.Types.ObjectId.isValid(receiverId)) {
+            return res.status(400).json({ message: "A valid receiver is required" });
+        }
+        if (receiverId.toString() === req.user.id.toString()) {
+            return res.status(400).json({ message: "You cannot message yourself" });
+        }
+        if (typeof message !== "string" || !message.trim()) {
+            return res.status(400).json({ message: "Message cannot be empty" });
+        }
         const receiver = await User.findById(receiverId);
         if (!receiver) {
             return res.status(404).json({ message: "Receiver not found" });
         }
-        const newMessage = await Message.create({ senderId: req.user.id, receiverId, expoId, message });
+        const newMessage = await Message.create({ senderId: req.user.id, receiverId, expoId, message: message.trim() });
         await notifyUser(req.app.get("io"), {
             userId: receiverId,
             title: "New message",
@@ -28,6 +38,9 @@ const getConversation = async (req, res) => {
     try {
         const userId = req.user.id;
         const otherUserId = req.params.userId;
+        if (!mongoose.Types.ObjectId.isValid(otherUserId)) {
+            return res.status(400).json({ message: "A valid contact is required" });
+        }
         const messages = await Message.find({
             $or: [
                 { senderId: userId, receiverId: otherUserId },

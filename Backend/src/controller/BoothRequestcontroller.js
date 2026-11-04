@@ -13,6 +13,7 @@ const requestBooth = async (req, res) => {
         if (booth.requestedBy.some(id => id.toString() === req.user.id)) return res.status(400).json({ message: "You have already requested this booth" });
         await Booth.findByIdAndUpdate(booth._id, { $addToSet: { requestedBy: req.user.id } });
         const expo = await Expo.findById(booth.expoId);
+        if (!expo) return res.status(404).json({ message: "Expo not found" });
         await notifyUser(req.app.get("io"), { userId: expo.organizerId, title: "Booth requested", message: `An exhibitor requested ${booth.boothNumber}.`, type: "booth", relatedExpoId: expo._id, email: false });
         return res.status(200).json({ message: "Booth request sent" });
     } catch (error) {

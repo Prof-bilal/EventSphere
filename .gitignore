@@ -12,6 +12,7 @@ frontend/dist/
 # Backend runtime uploads (keep the directory locally, not in Git)
 Backend/uploads/*
 !Backend/uploads/.gitkeep
+backups/
 
 # Logs and local tooling files
 *.log

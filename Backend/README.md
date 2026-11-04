@@ -27,8 +27,9 @@ Completed modules:
 - User feedback and admin feedback status management
 - Admin analytics
 - Admin user listing, blocking, and unblocking
+- Contract smoke tests for health, public access, authentication boundaries, and safe error responses
 
-This backend is intended for the current project requirements. Production hardening such as rate limiting, advanced logging, automated tests, and deployment configuration can be added later.
+This backend is intended for the current project requirements. The focused contract suite is run with `npm test`. Full load testing, penetration testing, production rate limiting, and hosted deployment hardening are not claimed by this local submission.
 
 ## Requirements
 
@@ -74,6 +75,32 @@ FRONTEND_URL=your_frontend_url
 ```
 
 Use your real MongoDB and Brevo values locally. Never share API keys or JWT secrets publicly.
+
+For evaluation, create the admin with `npm run create-admin`. Create attendee and exhibitor accounts through the frontend, verify their emails, and approve the exhibitor from the admin User management page. Keep the real evaluation credentials in the private final submission package; never commit them to GitHub.
+
+For repeatable local evaluation accounts, set the `DEMO_*` variables from `.env.example` and run `npm run seed:demo`. This creates verified and approved attendee/exhibitor accounts and a demo exhibitor profile without sending email.
+
+To populate the first published expo with demo booths and sessions, run `npm run seed:content`. The command is idempotent and does not overwrite existing seeded records.
+
+## Database backup
+
+From this directory run:
+
+```bash
+npm run backup:db
+```
+
+The command reads `MONGO_URI` from `.env` and writes a timestamped backup under `../backups/`. It prefers BSON `mongodump`; when that binary is unavailable it writes one JSON file per MongoDB collection plus `backup-manifest.json`. The backup directory is ignored by Git so it can be added separately to the final ZIP submission.
+
+## Verification
+
+Run the local contract checks after MongoDB is available:
+
+```bash
+npm test
+```
+
+The suite verifies the health endpoint, public expo listing, authentication boundary, invalid-login behavior, and safe rejection of malformed protected requests.
 
 ## Run the backend
 

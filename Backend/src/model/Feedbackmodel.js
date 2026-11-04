@@ -13,6 +13,7 @@ const feedbackSchema = new mongoose.Schema({
     },
     rating: {
         type: Number,
+        required: [true, "Rating is required"],
         min: 1,
         max: 5
     },

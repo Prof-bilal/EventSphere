@@ -20,10 +20,10 @@ export default function AttendancePage() {
   useEffect(() => {
     loadRegistrations()
   }, [])
-  async function markPresent(id) {
+  async function markPresent(id, badgeNumber) {
     setBusy(true)
     try {
-      await api('/expoRegistration/register/attend/' + id, 'PUT')
+      await api('/expoRegistration/register/attend/' + id, 'PUT', { badgeNumber })
       await loadRegistrations()
     } catch (error) {
       setError(error.message)
@@ -40,7 +40,7 @@ export default function AttendancePage() {
       setError('No registered attendee found with that badge number.')
       return
     }
-    await markPresent(registration._id)
+    await markPresent(registration._id, badgeNumber.trim())
     setBadgeNumber('')
   }
   const filtered = registrations.filter((item) =>
@@ -121,7 +121,7 @@ export default function AttendancePage() {
                     disabled={
                       busy || item.attendanceStatus === 'present' || item.status !== 'registered'
                     }
-                    onClick={() => markPresent(item._id)}
+                    onClick={() => markPresent(item._id, String(item.badgeNumber || item.registrationNumber))}
                   >
                     Mark present
                   </button>

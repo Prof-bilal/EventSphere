@@ -71,8 +71,9 @@ The assignment modules are implemented in the backend and connected to the front
 - Sessions, attendee expo registration, bookmarks, feedback, messaging, and analytics
 - Profile, logo, and document uploads
 - Brevo email notifications and Socket.IO real-time notifications
+- Contract smoke tests for health, public access, authentication boundaries, and safe error responses
 
-This is a project backend, not a production deployment. Rate limiting, advanced logging, automated tests, and deployment hardening can be added later.
+This is a project backend, not a production deployment. The repository includes a focused contract smoke suite; full load testing, penetration testing, hosted deployment hardening, and production rate limiting remain outside this local submission check.
 
 ## Main API prefixes
 
@@ -155,6 +156,25 @@ npm run create-admin
 ```
 
 The script creates a verified organizer account and leaves existing accounts untouched. Public registration creates only attendee and exhibitor accounts. Exhibitors verify their email and wait for organizer approval from the User management page before signing in.
+
+## Evaluation accounts and database backup
+
+Do not commit real credentials. For a demonstration environment, create the organizer account with `ADMIN_NAME`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD` in `Backend/.env`, then run `npm run create-admin` from `Backend/`. Create attendee and exhibitor accounts through the public registration page; verify the attendee email and approve the exhibitor from the organizer User management page before testing those roles. Record the actual local/demo credentials in the private submission package, not in Git.
+
+For repeatable local evaluation accounts, set the `DEMO_*` variables from `Backend/.env.example` and run `npm run seed:demo` from `Backend/`. This creates verified, approved attendee and exhibitor accounts without sending email. Record the values you used in the private final submission credentials document.
+
+To add realistic demo content to the first published expo, run `npm run seed:content` from `Backend/`. It is safe to run again because existing seeded booth and session titles are left unchanged.
+
+Create a backup with:
+
+```bash
+cd Backend
+npm run backup:db
+```
+
+The backup is written to `backups/eventsphere-<timestamp>/`, which is ignored by Git. To use another destination, set `BACKUP_DIR` before running the command. Include the generated backup folder in the final ZIP submission, not in the source repository.
+
+The backup command prefers BSON `mongodump` when MongoDB Database Tools are installed. If they are unavailable, it creates a timestamped JSON collection snapshot with `backup-manifest.json`.
 
 ## Beginner Git workflow
 

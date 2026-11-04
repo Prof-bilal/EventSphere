@@ -14,14 +14,22 @@ const createExpo = async (req, res) => {
 
         const currentTimestamp = Date.now();
         const parsedStartDate = new Date(startDate).getTime();
+        const parsedEndDate = new Date(endDate).getTime();
+        const parsedDeadline = new Date(registrationDeadline).getTime();
 
+        if (!Number.isFinite(parsedStartDate) || !Number.isFinite(parsedEndDate) || !Number.isFinite(parsedDeadline)) {
+            return res.status(400).json({ message: "Please provide valid expo dates." });
+        }
         if (parsedStartDate <= currentTimestamp) {
             return res.status(400).json({
                 message: "Please provide a valid start date in the future."
             });
         }
-        if (endDate <= startDate) {
+        if (parsedEndDate <= parsedStartDate) {
             return res.status(400).json({ message: "End date must be after the start date." });
+        }
+        if (parsedDeadline <= currentTimestamp || parsedDeadline > parsedStartDate) {
+            return res.status(400).json({ message: "Registration deadline must be in the future and no later than the expo start date." });
         }
 
 
@@ -42,15 +50,20 @@ const getExpo = async (req, res) => {
         const { search, status, location } = req.query;
         const filter = {};
 
+        // Guests and non-admin users must never receive draft or cancelled
+        // expos. Admins need the full list for management screens.
+        if (req.user?.role === "admin") {
+            if (status) filter.status = status;
+        } else {
+            filter.status = "published";
+        }
+
         if (search) {
             filter.$or = [
                 { title: { $regex: search, $options: "i" } },
                 { description: { $regex: search, $options: "i" } },
                 { theme: { $regex: search, $options: "i" } }
             ];
-        }
-        if (status) {
-            filter.status = status;
         }
         if (location) {
             filter.location = { $regex: location, $options: "i" };
@@ -67,9 +80,9 @@ const getExpo = async (req, res) => {
 const getExpoDetail = async (req , res) => {
       try {
         const {id} = req.params;
-      
 
-        const getExpo = await Expo.findById(id)
+        const filter = req.user?.role === "admin" ? { _id: id } : { _id: id, status: "published" };
+        const getExpo = await Expo.findOne(filter)
 
         if (!getExpo) {
             return res.status(404).json({message : "Expo Details not found"})

@@ -148,9 +148,17 @@ const updateRegistrationDetails = async (req, res) => {
 const markAttendance = async (req, res) => {
     try {
         const { id } = req.params;
+        const submittedBadgeNumber = String(req.body?.badgeNumber || "").trim();
         const registration = await Registration.findById(id);
         if (!registration) {
             return res.status(404).json({ message: "Registration not found" });
+        }
+        if (!submittedBadgeNumber) {
+            return res.status(400).json({ message: "Badge number is required" });
+        }
+        const expectedBadgeNumber = String(registration.badgeNumber || registration.registrationNumber);
+        if (submittedBadgeNumber !== expectedBadgeNumber) {
+            return res.status(400).json({ message: "Badge number does not match this registration" });
         }
         if (registration.status === "cancelled") {
             return res.status(400).json({ message: "Cannot mark attendance for a cancelled registration" });

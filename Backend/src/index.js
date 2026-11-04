@@ -28,7 +28,8 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "*",
+        origin: process.env.FRONTEND_URL || "http://localhost:5173",
+        credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE"]
     }
 });
@@ -53,7 +54,21 @@ app.use("/api/analytics", analyticsRoutes);
 app.use("/api/attendee", attendeeRoutes);
 app.set("io", io);
 app.use((error, req, res, next) => {
-    res.status(error.status || 400).json({ message: error.message });
+    if (res.headersSent) return next(error);
+    if (error.name === "ValidationError") {
+        return res.status(400).json({
+            message: "Request validation failed",
+            details: Object.values(error.errors).map((item) => item.message),
+        });
+    }
+    if (error.name === "CastError") {
+        return res.status(400).json({ message: "One or more identifiers are invalid" });
+    }
+    if (error.code === 11000) {
+        return res.status(409).json({ message: "A record with these values already exists" });
+    }
+    console.error("Unhandled API error:", error);
+    return res.status(error.status || 500).json({ message: error.message || "Internal server error" });
 });
 
 io.use(async (socket, next) => {
